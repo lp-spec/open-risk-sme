@@ -91,16 +91,16 @@
 
                 <!-- Quick Actions -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <button onclick="alert('Add Income - Coming soon!')" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium">
+                    <button onclick="alert('Add Income - Coming soon!')" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium shadow">
                         + Add Income
                     </button>
-                    <button onclick="alert('Add Expense - Coming soon!')" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium">
+                    <button onclick="alert('Add Expense - Coming soon!')" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium shadow">
                         - Add Expense
                     </button>
-                    <button data-tab="predictions" class="nav-link bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-medium">
+                    <button data-tab="predictions" class="action-btn bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-medium shadow">
                         View Predictions
                     </button>
-                    <button data-tab="reports" class="nav-link bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium">
+                    <button data-tab="reports" class="action-btn bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium shadow">
                         Generate Report
                     </button>
                 </div>
@@ -279,7 +279,7 @@
     </div>
 
     <script>
-        // Navigation
+        // Navigation for sidebar
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -290,6 +290,24 @@
                 document.getElementById(tab).style.display = 'block';
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active', 'bg-blue-600'));
                 this.classList.add('active', 'bg-blue-600');
+            });
+        });
+
+        // Navigation for action buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tab = this.getAttribute('data-tab');
+                if (!tab) return;
+                
+                document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+                document.getElementById(tab).style.display = 'block';
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active', 'bg-blue-600'));
+                document.querySelectorAll('.nav-link').forEach(l => {
+                    if (l.getAttribute('data-tab') === tab) {
+                        l.classList.add('active', 'bg-blue-600');
+                    }
+                });
             });
         });
 
