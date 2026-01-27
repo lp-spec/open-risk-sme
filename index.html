@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CashSafe - AI-powered cash flow prediction and risk management for small businesses">
-    <title>CashSafe - Smart Cash Flow Management for Small Businesses</title>
+    <title>CashSafe - Smart Cash Flow Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -14,30 +13,32 @@
         <div class="w-64 bg-gray-900 text-white flex flex-col">
             <div class="p-6 border-b border-gray-700">
                 <h1 class="text-2xl font-bold">💰 CashSafe</h1>
-                <p class="text-sm text-gray-400 mt-1">Demo Corporation</p>
+                <p class="text-sm text-gray-400 mt-1">Demo Corp</p>
             </div>
             
             <nav class="flex-1 p-4 space-y-2">
-                <a href="#" data-tab="dashboard" class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+                <a href="#" data-tab="dashboard" class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600">
                     <span>📊</span> Dashboard
                 </a>
-                <a href="#" data-tab="cashflow" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+                <a href="#" data-tab="cashflow" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800">
                     <span>💵</span> Cash Flow
                 </a>
-                <a href="#" data-tab="predictions" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
+                <a href="#" data-tab="predictions" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800">
                     <span>🔮</span> Predictions
                 </a>
-                <a href="#" data-tab="settings" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition">
-                    <span>⚙️</span> Pricing
+                <a href="#" data-tab="reports" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800">
+                    <span>📄</span> Reports
+                </a>
+                <a href="#" data-tab="pricing" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800">
+                    <span>💳</span> Pricing
                 </a>
             </nav>
 
             <div class="p-4 border-t border-gray-700">
-                <div class="bg-gray-800 px-4 py-3 rounded-lg border border-gray-700">
+                <div class="bg-gray-800 px-4 py-3 rounded-lg">
                     <p class="text-xs font-semibold text-gray-300">DEMO MODE</p>
-                    <p class="text-xs text-gray-400 mt-1">Explore all features</p>
-                    <a href="mailto:contact@cashsafe.app" class="mt-2 block text-center bg-purple-600 text-white text-xs font-semibold px-3 py-1.5 rounded hover:bg-purple-700 transition">
-                        Request Access
+                    <a href="mailto:contact@cashsafe.app" class="mt-2 block text-center bg-purple-600 text-white text-xs font-semibold px-3 py-1.5 rounded hover:bg-purple-700">
+                        Get Access
                     </a>
                 </div>
             </div>
@@ -45,53 +46,35 @@
 
         <!-- Main Content -->
         <div class="flex-1 overflow-y-auto">
-            <!-- Dashboard Tab -->
+            <!-- Dashboard -->
             <div id="dashboard" class="tab-content p-8">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-                    <p class="text-gray-600 mt-2">Get instant insights into your business cash flow health</p>
-                </div>
+                <h1 class="text-3xl font-bold mb-8">Dashboard</h1>
 
-                <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-gray-600 text-sm">Current Balance</span>
-                            <span class="text-2xl">💵</span>
-                        </div>
-                        <div class="text-3xl font-bold text-gray-900">$45,230</div>
-                        <p class="text-xs text-green-600 mt-2">↑ +12.5% from last month</p>
+                <!-- Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="text-sm text-gray-600 mb-2">Current Balance</div>
+                        <div class="text-3xl font-bold">$45,230</div>
+                        <div class="text-xs text-green-600 mt-2">↑ +12.5%</div>
                     </div>
-
-                    <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-gray-600 text-sm">Monthly Income</span>
-                            <span class="text-2xl">📈</span>
-                        </div>
-                        <div class="text-3xl font-bold text-gray-900">$25,000</div>
-                        <p class="text-xs text-green-600 mt-2">↑ +8.3%</p>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="text-sm text-gray-600 mb-2">Monthly Income</div>
+                        <div class="text-3xl font-bold">$25,000</div>
+                        <div class="text-xs text-green-600 mt-2">↑ +8.3%</div>
                     </div>
-
-                    <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-gray-600 text-sm">Monthly Expenses</span>
-                            <span class="text-2xl">📉</span>
-                        </div>
-                        <div class="text-3xl font-bold text-gray-900">$18,500</div>
-                        <p class="text-xs text-red-600 mt-2">↑ +3.2%</p>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="text-sm text-gray-600 mb-2">Monthly Expenses</div>
+                        <div class="text-3xl font-bold">$18,500</div>
+                        <div class="text-xs text-red-600 mt-2">↑ +3.2%</div>
                     </div>
-
-                    <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-gray-600 text-sm">Health Score</span>
-                            <span class="text-2xl">⭐</span>
-                        </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="text-sm text-gray-600 mb-2">Health Score</div>
                         <div class="flex items-center gap-2">
-                            <div class="text-3xl font-bold text-gray-900">75</div>
+                            <div class="text-3xl font-bold">75</div>
                             <span class="px-2 py-1 rounded text-xs font-medium bg-green-50 text-green-600">Healthy</span>
                         </div>
                         <div class="mt-3">
-                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div class="h-2 bg-gray-200 rounded-full">
                                 <div class="h-full bg-green-600 rounded-full" style="width: 75%"></div>
                             </div>
                         </div>
@@ -101,38 +84,57 @@
                 <!-- Chart -->
                 <div class="bg-white rounded-lg shadow p-6 mb-8">
                     <h2 class="text-lg font-semibold mb-4">Cash Flow Trend (Last 6 Months)</h2>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="cashflowChart"></canvas>
-                    </div>
+                    <canvas id="chart1" style="height: 300px;"></canvas>
                 </div>
 
-                <!-- Features Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6">
-                        <div class="text-3xl mb-3">🤖</div>
-                        <h3 class="font-semibold text-lg mb-2">AI-Powered Insights</h3>
-                        <p class="text-sm text-gray-700">Get intelligent recommendations based on your cash flow patterns</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6">
-                        <div class="text-3xl mb-3">📊</div>
-                        <h3 class="font-semibold text-lg mb-2">90-Day Predictions</h3>
-                        <p class="text-sm text-gray-700">See your future cash position and plan ahead with confidence</p>
-                    </div>
-                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6">
-                        <div class="text-3xl mb-3">⚠️</div>
-                        <h3 class="font-semibold text-lg mb-2">Risk Alerts</h3>
-                        <p class="text-sm text-gray-700">Get early warnings about potential cash shortages</p>
-                    </div>
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <button onclick="alert('Add Income - Coming soon!')" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-medium">
+                        + Add Income
+                    </button>
+                    <button onclick="alert('Add Expense - Coming soon!')" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 font-medium">
+                        - Add Expense
+                    </button>
+                    <button data-tab="predictions" class="nav-link bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-medium">
+                        View Predictions
+                    </button>
+                    <button data-tab="reports" class="nav-link bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium">
+                        Generate Report
+                    </button>
                 </div>
             </div>
 
-            <!-- Cash Flow Tab -->
-            <div id="cashflow" class="tab-content p-8" style="display: none;">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-900">Cash Flow Management</h1>
-                    <p class="text-gray-600 mt-2">Track every dollar in and out of your business</p>
+            <!-- Cash Flow -->
+            <div id="cashflow" class="tab-content p-8" style="display:none;">
+                <div class="flex justify-between mb-8">
+                    <h1 class="text-3xl font-bold">Cash Flow Management</h1>
+                    <div class="flex gap-3">
+                        <button onclick="alert('Import CSV - Coming soon!')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            📤 Import CSV
+                        </button>
+                        <button onclick="alert('New Transaction - Coming soon!')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            + New
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Upload Section -->
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-dashed border-blue-300 rounded-lg p-8 mb-6 text-center">
+                    <div class="text-5xl mb-4">📊</div>
+                    <h3 class="text-xl font-semibold mb-2">Quick Import</h3>
+                    <p class="text-gray-600 mb-4">Upload your bank statement or accounting file</p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="alert('Upload CSV - Coming soon!')" class="bg-white border-2 border-blue-500 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-50 font-medium">
+                            📄 Upload CSV
+                        </button>
+                        <button onclick="alert('Upload PDF - Coming soon!')" class="bg-white border-2 border-purple-500 text-purple-600 px-6 py-2 rounded-lg hover:bg-purple-50 font-medium">
+                            📋 Upload PDF
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Supports: QuickBooks, Xero, Wave, Excel, bank statements</p>
+                </div>
+
+                <!-- Table -->
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <table class="w-full">
                         <thead class="bg-gray-50">
@@ -143,165 +145,129 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y">
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm text-gray-900">Jan 20, 2026</td>
+                                <td class="px-6 py-4 text-sm">Jan 20</td>
                                 <td class="px-6 py-4 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Income</span></td>
-                                <td class="px-6 py-4 text-sm text-gray-600">Client Payment - Project Alpha</td>
+                                <td class="px-6 py-4 text-sm">Client Payment</td>
                                 <td class="px-6 py-4 text-sm font-semibold text-green-600">+$5,000</td>
                             </tr>
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm text-gray-900">Jan 18, 2026</td>
+                                <td class="px-6 py-4 text-sm">Jan 18</td>
                                 <td class="px-6 py-4 text-sm"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Income</span></td>
-                                <td class="px-6 py-4 text-sm text-gray-600">Consulting Services</td>
+                                <td class="px-6 py-4 text-sm">Consulting</td>
                                 <td class="px-6 py-4 text-sm font-semibold text-green-600">+$3,200</td>
                             </tr>
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm text-gray-900">Jan 15, 2026</td>
+                                <td class="px-6 py-4 text-sm">Jan 15</td>
                                 <td class="px-6 py-4 text-sm"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Expense</span></td>
-                                <td class="px-6 py-4 text-sm text-gray-600">Office Rent - January</td>
+                                <td class="px-6 py-4 text-sm">Office Rent</td>
                                 <td class="px-6 py-4 text-sm font-semibold text-red-600">-$3,500</td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm text-gray-900">Jan 12, 2026</td>
-                                <td class="px-6 py-4 text-sm"><span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Expense</span></td>
-                                <td class="px-6 py-4 text-sm text-gray-600">Payroll</td>
-                                <td class="px-6 py-4 text-sm font-semibold text-red-600">-$8,200</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Predictions Tab -->
-            <div id="predictions" class="tab-content p-8" style="display: none;">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-900">Cash Flow Predictions</h1>
-                    <p class="text-gray-600 mt-2">See your financial future with AI-powered forecasting</p>
-                </div>
-
+            <!-- Predictions -->
+            <div id="predictions" class="tab-content p-8" style="display:none;">
+                <h1 class="text-3xl font-bold mb-8">Cash Flow Predictions</h1>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div class="bg-white rounded-lg shadow p-6">
-                        <div class="text-gray-600 text-sm mb-2">Predicted Low Point</div>
-                        <div class="text-2xl font-bold text-gray-900">$35,200</div>
-                        <div class="text-xs text-gray-500 mt-1">February 20, 2026</div>
+                        <div class="text-sm text-gray-600 mb-2">Lowest Balance</div>
+                        <div class="text-2xl font-bold">$35,200</div>
+                        <div class="text-xs text-gray-500 mt-1">Feb 20</div>
                     </div>
                     <div class="bg-white rounded-lg shadow p-6">
-                        <div class="text-gray-600 text-sm mb-2">Average Risk Score</div>
+                        <div class="text-sm text-gray-600 mb-2">Risk Score</div>
                         <div class="text-2xl font-bold text-yellow-600">42</div>
-                        <div class="text-xs text-gray-500 mt-1">Medium Risk</div>
+                        <div class="text-xs text-gray-500 mt-1">Medium</div>
                     </div>
                     <div class="bg-white rounded-lg shadow p-6">
-                        <div class="text-gray-600 text-sm mb-2">Peak Risk Day</div>
+                        <div class="text-sm text-gray-600 mb-2">Peak Risk</div>
                         <div class="text-2xl font-bold text-red-600">68</div>
-                        <div class="text-xs text-gray-500 mt-1">Score out of 100</div>
+                        <div class="text-xs text-gray-500 mt-1">High</div>
                     </div>
                     <div class="bg-white rounded-lg shadow p-6">
-                        <div class="text-gray-600 text-sm mb-2">Recommended Reserve</div>
-                        <div class="text-2xl font-bold text-gray-900">$55,500</div>
-                        <div class="text-xs text-gray-500 mt-1">3 months coverage</div>
+                        <div class="text-sm text-gray-600 mb-2">Reserve Needed</div>
+                        <div class="text-2xl font-bold">$55,500</div>
+                        <div class="text-xs text-gray-500 mt-1">3 months</div>
                     </div>
                 </div>
-
-                <div class="bg-white rounded-lg shadow p-6 mb-8">
-                    <h2 class="text-lg font-semibold mb-4">30-Day Cash Flow Forecast</h2>
-                    <div style="position: relative; height: 300px;">
-                        <canvas id="predictionChart"></canvas>
-                    </div>
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <h2 class="text-lg font-semibold mb-4">30-Day Forecast</h2>
+                    <canvas id="chart2" style="height: 300px;"></canvas>
                 </div>
-
-                <div class="bg-white rounded-lg shadow p-6">
+                <div class="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="text-2xl">✨</span>
-                        <h2 class="text-xl font-bold">AI-Generated Analysis</h2>
+                        <h3 class="text-xl font-bold">AI Analysis</h3>
                     </div>
-                    <div class="bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-5 space-y-4 text-gray-700">
-                        <p><strong>Financial Health Summary:</strong> Your business demonstrates stable cash flow with a current runway of 2.4 months based on average monthly expenses of $18,500.</p>
-                        <p><strong>Risk Assessment:</strong> Our AI has identified a potential cash shortage around February 20th, when your balance is predicted to drop to $35,200. This falls below your recommended 3-month reserve of $55,500.</p>
-                        <div class="mt-4 space-y-3">
-                            <h3 class="font-semibold">Recommended Actions:</h3>
-                            <div class="flex gap-3 bg-white p-3 rounded-lg shadow-sm">
-                                <span class="text-green-600 text-xl flex-shrink-0">✓</span>
-                                <span>Build a cash reserve of at least $55,500 (3 months of operating expenses) to improve financial stability</span>
-                            </div>
-                            <div class="flex gap-3 bg-white p-3 rounded-lg shadow-sm">
-                                <span class="text-green-600 text-xl flex-shrink-0">✓</span>
-                                <span>Accelerate invoice collections before the predicted February dip to maintain healthy cash levels</span>
-                            </div>
-                            <div class="flex gap-3 bg-white p-3 rounded-lg shadow-sm">
-                                <span class="text-green-600 text-xl flex-shrink-0">✓</span>
-                                <span>Consider negotiating extended payment terms with suppliers to smooth out cash flow fluctuations</span>
-                            </div>
+                    <p class="mb-4"><strong>Health:</strong> Stable cash flow with 2.4 months runway.</p>
+                    <p class="mb-4"><strong>Risk:</strong> Low of $35,200 on Feb 20 is below 3-month reserve.</p>
+                    <div class="space-y-2">
+                        <div class="bg-white p-3 rounded flex gap-2">
+                            <span class="text-green-600">✓</span>
+                            <span class="text-sm">Build $55,500 reserve (3 months coverage)</span>
+                        </div>
+                        <div class="bg-white p-3 rounded flex gap-2">
+                            <span class="text-green-600">✓</span>
+                            <span class="text-sm">Accelerate invoice collections</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Pricing Tab -->
-            <div id="settings" class="tab-content p-8" style="display: none;">
-                <div class="mb-6 text-center">
-                    <h1 class="text-3xl font-bold text-gray-900">Simple, Transparent Pricing</h1>
-                    <p class="text-gray-600 mt-2">Choose the plan that fits your business needs</p>
+            <!-- Reports -->
+            <div id="reports" class="tab-content p-8" style="display:none;">
+                <h1 class="text-3xl font-bold mb-8">Reports</h1>
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-lg font-semibold mb-4">Generate Report</h2>
+                    <button onclick="alert('Generate Report - Coming soon!')" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        Generate
+                    </button>
                 </div>
+            </div>
 
-                <div class="bg-white rounded-lg shadow p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-gray-300 transition">
-                            <h3 class="font-bold text-xl mb-2">Starter</h3>
-                            <p class="text-3xl font-bold mb-4">$0<span class="text-base text-gray-600">/month</span></p>
-                            <p class="text-sm text-gray-600 mb-6">Perfect for getting started</p>
-                            <ul class="space-y-3 mb-8 text-sm">
-                                <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Up to 100 transactions</li>
-                                <li class="flex items-center gap-2"><span class="text-green-600">✓</span> 30-day predictions</li>
-                                <li class="flex items-center gap-2"><span class="text-green-600">✓</span> 5 AI analyses per month</li>
-                                <li class="flex items-center gap-2"><span class="text-green-600">✓</span> Basic reports</li>
-                            </ul>
-                            <a href="mailto:contact@cashsafe.app?subject=Free%20Plan%20Inquiry" class="block w-full text-center bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition">
-                                Get Started Free
-                            </a>
-                        </div>
-
-                        <div class="border-2 border-purple-600 rounded-xl p-6 relative shadow-lg transform scale-105">
-                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs px-4 py-1 rounded-full font-semibold">
-                                ⭐ Most Popular
-                            </div>
-                            <h3 class="font-bold text-xl mb-2">Professional</h3>
-                            <p class="text-3xl font-bold mb-4">$39<span class="text-base text-gray-600">/month</span></p>
-                            <p class="text-sm text-gray-600 mb-6">For growing businesses</p>
-                            <ul class="space-y-3 mb-8 text-sm">
-                                <li class="flex items-center gap-2"><span class="text-purple-600">✓</span> Unlimited transactions</li>
-                                <li class="flex items-center gap-2"><span class="text-purple-600">✓</span> 90-day predictions</li>
-                                <li class="flex items-center gap-2"><span class="text-purple-600">✓</span> 100 AI analyses per month</li>
-                                <li class="flex items-center gap-2"><span class="text-purple-600">✓</span> Advanced PDF reports</li>
-                                <li class="flex items-center gap-2"><span class="text-purple-600">✓</span> Priority email support</li>
-                            </ul>
-                            <a href="mailto:contact@cashsafe.app?subject=Professional%20Plan%20Inquiry" class="block w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition">
-                                Start 14-Day Trial
-                            </a>
-                        </div>
-
-                        <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-gray-300 transition">
-                            <h3 class="font-bold text-xl mb-2">Enterprise</h3>
-                            <p class="text-3xl font-bold mb-4">$149<span class="text-base text-gray-600">/month</span></p>
-                            <p class="text-sm text-gray-600 mb-6">For established companies</p>
-                            <ul class="space-y-3 mb-8 text-sm">
-                                <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> Everything in Professional</li>
-                                <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> Unlimited AI analyses</li>
-                                <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> API access</li>
-                                <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> Multi-user accounts</li>
-                                <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> Dedicated account manager</li>
-                            </ul>
-                            <a href="mailto:contact@cashsafe.app?subject=Enterprise%20Plan%20Inquiry" class="block w-full text-center bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                                Contact Sales
-                            </a>
-                        </div>
+            <!-- Pricing -->
+            <div id="pricing" class="tab-content p-8" style="display:none;">
+                <h1 class="text-3xl font-bold mb-2 text-center">Simple Pricing</h1>
+                <p class="text-gray-600 mb-8 text-center">Choose your plan</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <div class="border-2 rounded-xl p-6">
+                        <h3 class="font-bold text-xl mb-2">Free</h3>
+                        <div class="text-3xl font-bold mb-4">$0<span class="text-sm text-gray-600">/mo</span></div>
+                        <ul class="space-y-2 mb-6 text-sm">
+                            <li>✓ 100 transactions</li>
+                            <li>✓ 30-day predictions</li>
+                            <li>✓ 5 AI analyses</li>
+                        </ul>
+                        <button class="w-full bg-gray-200 py-2 rounded">Current</button>
                     </div>
-
-                    <div class="mt-12 text-center">
-                        <p class="text-gray-600 mb-4">Questions about pricing or features?</p>
-                        <a href="mailto:contact@cashsafe.app" class="inline-block bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition">
-                            Contact Us
-                        </a>
+                    <div class="border-2 border-purple-600 rounded-xl p-6 shadow-lg">
+                        <div class="text-center mb-2">
+                            <span class="bg-purple-600 text-white text-xs px-3 py-1 rounded-full">Popular</span>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2">Pro</h3>
+                        <div class="text-3xl font-bold mb-4">$39<span class="text-sm text-gray-600">/mo</span></div>
+                        <ul class="space-y-2 mb-6 text-sm">
+                            <li>✓ Unlimited transactions</li>
+                            <li>✓ 90-day predictions</li>
+                            <li>✓ 100 AI analyses</li>
+                            <li>✓ PDF reports</li>
+                        </ul>
+                        <button class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700">Upgrade</button>
+                    </div>
+                    <div class="border-2 rounded-xl p-6">
+                        <h3 class="font-bold text-xl mb-2">Enterprise</h3>
+                        <div class="text-3xl font-bold mb-4">$149<span class="text-sm text-gray-600">/mo</span></div>
+                        <ul class="space-y-2 mb-6 text-sm">
+                            <li>✓ All Pro features</li>
+                            <li>✓ Unlimited AI</li>
+                            <li>✓ API access</li>
+                            <li>✓ Priority support</li>
+                        </ul>
+                        <button class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Contact</button>
                     </div>
                 </div>
             </div>
@@ -313,110 +279,84 @@
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
-                const targetTab = this.getAttribute('data-tab');
+                const tab = this.getAttribute('data-tab');
+                if (!tab) return;
                 
-                document.querySelectorAll('.tab-content').forEach(tab => {
-                    tab.style.display = 'none';
-                });
-                
-                document.getElementById(targetTab).style.display = 'block';
-                
-                document.querySelectorAll('.nav-link').forEach(l => {
-                    l.classList.remove('active', 'bg-blue-600');
-                });
+                document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+                document.getElementById(tab).style.display = 'block';
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active', 'bg-blue-600'));
                 this.classList.add('active', 'bg-blue-600');
             });
         });
 
-        // Initialize Charts
+        // Charts with tooltips
         window.addEventListener('load', function() {
-            const ctx1 = document.getElementById('cashflowChart');
-            if (ctx1) {
-                new Chart(ctx1, {
-                    type: 'line',
-                    data: {
-                        labels: ['August', 'September', 'October', 'November', 'December', 'January'],
-                        datasets: [{
-                            label: 'Income',
-                            data: [22000, 23500, 21000, 24000, 23000, 25000],
-                            borderColor: '#10B981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }, {
-                            label: 'Expenses',
-                            data: [18000, 17500, 19000, 18000, 17800, 18500],
-                            borderColor: '#EF4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return '$' + value.toLocaleString();
-                                    }
+            new Chart(document.getElementById('chart1'), {
+                type: 'line',
+                data: {
+                    labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+                    datasets: [{
+                        label: 'Income',
+                        data: [22000, 23500, 21000, 24000, 23000, 25000],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        fill: true
+                    }, {
+                        label: 'Expenses',
+                        data: [18000, 17500, 19000, 18000, 17800, 18500],
+                        borderColor: '#EF4444',
+                        backgroundColor: 'rgba(239,68,68,0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': $' + ctx.parsed.y.toLocaleString();
+                                },
+                                afterBody: function(ctx) {
+                                    const inc = ctx[0].chart.data.datasets[0].data[ctx[0].dataIndex];
+                                    const exp = ctx[0].chart.data.datasets[1].data[ctx[0].dataIndex];
+                                    const net = inc - exp;
+                                    return ['', 'Net: $' + net.toLocaleString()];
                                 }
                             }
                         }
-                    }
-                });
-            }
+                    },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + v.toLocaleString() }}}
+                }
+            });
 
-            const ctx2 = document.getElementById('predictionChart');
-            if (ctx2) {
-                new Chart(ctx2, {
-                    type: 'line',
-                    data: {
-                        labels: ['Today', 'Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                        datasets: [{
-                            label: 'Predicted Balance',
-                            data: [45230, 43800, 41500, 38200, 35200],
-                            borderColor: '#2563EB',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Balance: $' + context.parsed.y.toLocaleString();
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: {
-                                    callback: function(value) {
-                                        return '$' + value.toLocaleString();
-                                    }
-                                }
-                            }
+            new Chart(document.getElementById('chart2'), {
+                type: 'line',
+                data: {
+                    labels: ['Today', 'Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    datasets: [{
+                        label: 'Predicted Balance',
+                        data: [45230, 43800, 41500, 38200, 35200],
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37,99,235,0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: { label: ctx => 'Balance: $' + ctx.parsed.y.toLocaleString() }
                         }
-                    }
-                });
-            }
+                    },
+                    scales: { y: { ticks: { callback: v => '$' + v.toLocaleString() }}}
+                }
+            });
         });
     </script>
 </body>
