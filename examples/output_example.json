@@ -1,0 +1,10 @@
+{
+  "risk_level": "Moderate",
+  "summary": "Risk Score: 70",
+  "details": {
+    "dscr": 1.1,
+    "volatility": 0.18,
+    "risk_score": 70,
+    "explanations": ["Low DSCR"]
+  }
+}
