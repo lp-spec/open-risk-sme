@@ -22,6 +22,7 @@ python main.py
   "risk_level": "Moderate",
   "summary": "Risk Score: 70"
 }
+See: examples/output_example.json
 
 ## What This Does
 
