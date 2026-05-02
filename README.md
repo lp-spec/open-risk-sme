@@ -41,3 +41,14 @@ This tool bridges that gap.
 - More risk models
 - Industry benchmarks
 - API integrations
+
+## Before vs After
+
+### Input (raw SME data)
+CSV with revenue, expenses, debt
+
+### Output (this tool)
+- Risk Score
+- DSCR
+- Risk explanations
+- Lender-ready summary
