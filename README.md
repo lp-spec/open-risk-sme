@@ -2,50 +2,33 @@
 
 Turn messy small business financial data into lender-ready risk reports in seconds.
 
-## Why This Exists
+## Quick Start
 
-Small businesses struggle to access capital because:
-- Financial data is inconsistent
-- Risk is hard to interpret
-- Documentation is not lender-aligned
-
-This project fixes that.
-
-## Features
-
-- Normalize raw SME financials
-- Generate risk indicators (DSCR, volatility)
-- Produce lender-ready summaries
-- API + CLI support
-
-## Quick Start (30 seconds)
-
-pip install -r requirements.txt
+Clone the repo and run:
 
 python main.py
-
-OR
-
-openrisk examples/sample_input.csv
 
 ## Example Output
 
 {
-  "risk_score": 70,
   "risk_level": "Moderate",
-  "explanations": ["Low DSCR"]
+  "summary": "Risk Score: 70"
 }
 
-## Architecture
+## What This Does
 
-See docs/architecture.md
+- Normalizes SME financial data
+- Computes risk metrics (DSCR, volatility)
+- Generates lender-ready summaries
+
+## Why It Matters
+
+Small businesses are often rejected for funding due to poor financial presentation, not poor performance.
+
+This tool bridges that gap.
 
 ## Roadmap
 
-- Industry-specific models
-- Benchmark datasets
-- Credit decision simulation
-
-## Contributing
-
-PRs welcome. See CONTRIBUTING.md
+- More risk models
+- Industry benchmarks
+- API integrations
