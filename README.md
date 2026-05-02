@@ -1,3 +1,11 @@
+## Try it in 60 seconds
+
+git clone https://github.com/lp-spec/open-risk-sme
+cd open-risk-sme
+
+pip install -r requirements.txt
+python main.py
+
 # OpenRiskSME
 
 Turn messy small business financial data into lender-ready risk reports in seconds.
