@@ -201,16 +201,50 @@ if uploaded_file:
         # 📄 Summary JSON
         # -----------------------------
         st.subheader("📄 Summary Report")
-        result = {
-            "risk_score": score,
-            "risk_level": level,
-            "dscr": round(dscr, 2),
-            "volatility": round(volatility, 2),
-            "explanations": explanations
-        }
-
-        st.json(result)
-
+        
+        st.markdown(f"""
+        ### 🧾 Credit Risk Overview
+        
+        **Risk Score:** {score}  
+        **Risk Level:** {level}  
+        
+        ---
+        
+        ### 📊 Key Metrics
+        
+        - **DSCR:** {round(dscr, 2)}
+        - **Revenue Volatility:** {round(volatility, 2)}
+        
+        ---
+        
+        ### ⚠️ Risk Assessment
+        """)
+        
+        if explanations:
+            for e in explanations:
+                st.markdown(f"- {e}")
+        else:
+            st.markdown("- No significant risk factors identified")
+        
+        # --- Add interpretation ---
+        st.markdown("### 🧠 Interpretation")
+        
+        if level == "Low":
+            st.success("This business demonstrates strong financial stability and low credit risk.")
+        elif level == "Moderate":
+            st.warning("This business shows moderate risk. Cash flow or revenue stability may need improvement.")
+        else:
+            st.error("This business presents high credit risk. Careful review is recommended before lending.")
+        
+        # --- Optional expandable JSON (for advanced users) ---
+        with st.expander("🔍 View Raw Data (Advanced)"):
+            st.json({
+                "risk_score": score,
+                "risk_level": level,
+                "dscr": round(dscr, 2),
+                "volatility": round(volatility, 2),
+                "explanations": explanations
+            })
         # -----------------------------
         # 📥 PDF Download
         # -----------------------------
