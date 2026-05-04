@@ -1,7 +1,5 @@
-## Try it in 60 seconds
-
-Live Demo
-Try it here:(https://open-risk-sme.streamlit.app/)
+## Try it here:
+(https://open-risk-sme.streamlit.app/)
 
 # OpenRiskSME
 
