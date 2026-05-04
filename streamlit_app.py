@@ -229,28 +229,135 @@ if file:
     # =============================
     with tab3:
         st.subheader("📄 Credit Memo")
-
-        st.write(f"Risk Level: {level} | Score: {score:,}")
-
+    
+        # -----------------------------
+        # 🧾 Executive Summary
+        # -----------------------------
+        st.markdown("### 🧾 Executive Summary")
+    
+        st.write(f"""
+    The business presents a **{level} risk profile** with a risk score of **{score:,}**.
+    This evaluation reflects the company’s ability to generate stable revenue and cover debt obligations.
+    """)
+    
+        # -----------------------------
+        # 📊 Key Metrics
+        # -----------------------------
+        st.markdown("### 📊 Key Metrics")
+    
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Risk Score", f"{score:,}")
+        col2.metric("DSCR", round(dscr, 2))
+        col3.metric("Volatility", round(volatility, 2))
+    
         pd_val = calculate_pd(score, dscr, volatility)
-        st.metric("PD", f"{pd_val*100:.1f}%")
-
-        st.subheader("🏦 Lending Recommendation")
-
-        base = max(avg_cash*3,0)
-
-        if level=="Low":
-            decision="Approved"
-            rate="6–10%"
-        elif level=="Moderate":
-            decision="Conditional"
-            rate="10–16%"
-            base*=0.7
+        st.metric("Probability of Default (PD)", f"{pd_val*100:.1f}%")
+    
+        st.markdown("""
+    **What these mean:**
+    - **DSCR (Debt Service Coverage Ratio):** Ability to cover debt payments  
+      > Above 1.2 is generally considered healthy  
+    - **Volatility:** Stability of revenue  
+      > Lower volatility means more predictable income  
+    - **PD (Probability of Default):** Likelihood of failing to repay  
+    """)
+    
+        # -----------------------------
+        # 🏦 Risk Factors (Bank Style)
+        # -----------------------------
+        st.markdown("### 🏦 Key Risk Factors")
+    
+        if explanations:
+            for text, color in explanations:
+                st.markdown(f'<div class="card {color}">{text}</div>', unsafe_allow_html=True)
         else:
-            decision="Declined"
-            rate="N/A"
-            base=0
-
-        st.write(f"Decision: {decision}")
-        st.write(f"Loan: ${base:,.0f}")
-        st.write(f"Rate: {rate}")
+            st.markdown('<div class="card green">No major risk signals detected</div>', unsafe_allow_html=True)
+    
+        # -----------------------------
+        # 🧠 Interpretation
+        # -----------------------------
+        st.markdown("### 🧠 Credit Interpretation")
+    
+        if level == "Low":
+            st.success("Strong financial condition. Low likelihood of default.")
+        elif level == "Moderate":
+            st.warning("Moderate risk. Some instability in cash flow or revenue.")
+        else:
+            st.error("High risk. Debt repayment capacity is weak and requires caution.")
+    
+        # -----------------------------
+        # 🏦 Lending Recommendation (FULL)
+        # -----------------------------
+        st.markdown("### 🏦 Lending Recommendation")
+    
+        baseline = max(avg_cash * 3, 0)
+    
+        if level == "Low":
+            decision = "Approved"
+            rate = "6% – 10%"
+            term = "24–60 months"
+            conditions = [
+                "Standard underwriting review",
+                "No additional collateral required"
+            ]
+    
+        elif level == "Moderate":
+            decision = "Conditionally Approved"
+            rate = "10% – 16%"
+            term = "12–36 months"
+            baseline *= 0.7
+            conditions = [
+                "Provide additional financial documentation",
+                "Cash flow monitoring required",
+                "Possible personal guarantee"
+            ]
+    
+        else:
+            decision = "Declined"
+            rate = "N/A"
+            term = "N/A"
+            baseline = 0
+            conditions = [
+                "Insufficient cash flow coverage",
+                "Stabilize revenue before applying",
+                "Consider secured financing options"
+            ]
+    
+        col1, col2 = st.columns(2)
+    
+        col1.markdown(f"""
+    ### Decision: **{decision}**
+    - **Suggested Loan Amount:** ${baseline:,.0f}
+    - **Suggested Term:** {term}
+    """)
+    
+        col2.markdown(f"""
+    ### Pricing
+    - **Interest Rate:** {rate}
+    - **Risk Level:** {level}
+    """)
+    
+        st.markdown("### 📋 Conditions / Notes")
+        for c in conditions:
+            st.write(f"- {c}")
+    
+        # -----------------------------
+        # 📉 Debt Capacity Check
+        # -----------------------------
+        st.markdown("### 📉 Debt Capacity Check")
+    
+        if baseline > 0:
+            est_payment = baseline / 24
+            coverage = avg_cash / est_payment if est_payment else 0
+    
+            st.write(f"""
+    - Estimated Monthly Payment: ${est_payment:,.0f}
+    - Cash Flow Coverage: {round(coverage, 2)}
+    """)
+    
+            if coverage < 1.2:
+                st.warning("Loan may strain cash flow under current conditions.")
+            else:
+                st.success("Loan appears supportable based on current cash flow.")
+        else:
+            st.error("Loan not supportable under current conditions.")
