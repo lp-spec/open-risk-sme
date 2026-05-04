@@ -8,18 +8,24 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 st.set_page_config(page_title="SME Risk Analyzer", layout="wide")
 
 # -----------------------------
-# 🎨 Fix Font Hierarchy
+# 🎨 Fintech-style UI tweaks
 # -----------------------------
 st.markdown("""
 <style>
-h1 {font-size: 32px !important;}
+.block-container {padding-top: 1.5rem;}
+h1 {font-size: 30px !important;}
 h2 {font-size: 22px !important;}
 h3 {font-size: 18px !important;}
+.metric-card {
+    padding: 12px;
+    border-radius: 10px;
+    background-color: #f6f7fb;
+}
 </style>
 """, unsafe_allow_html=True)
 
 st.title("📊 SME Risk Analyzer")
-st.caption("Turn financial data into lender-ready risk insights")
+st.caption("Underwriting-style risk analysis, simulation, and lending decision")
 
 # -----------------------------
 # 📥 Template
@@ -29,273 +35,188 @@ Jan,80000,60000,10000
 Feb,85000,62000,10000
 """
 
-st.download_button(
-    "📥 Download CSV Template",
-    data=template,
-    file_name="sample_template.csv",
-    mime="text/csv"
-)
+st.download_button("📥 Download Template", template, "template.csv")
 
 # -----------------------------
-# 📄 BANK-STYLE PDF
+# 📄 PDF Generator (bank-style)
 # -----------------------------
-def generate_pdf_report(score, level, dscr, volatility, explanations):
+def generate_pdf(score, level, dscr, volatility):
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer)
-
     styles = getSampleStyleSheet()
 
-    title = ParagraphStyle(
-        'Title',
-        parent=styles['Title'],
-        fontSize=18,
-        spaceAfter=12
-    )
-
-    section = ParagraphStyle(
-        'Section',
-        parent=styles['Heading2'],
-        fontSize=12,
-        spaceAfter=6
-    )
-
-    normal = styles["Normal"]
+    section = ParagraphStyle('section', parent=styles['Heading2'], fontSize=12)
 
     elements = []
-
-    # Title
-    elements.append(Paragraph("SME Credit Risk Memo", title))
+    elements.append(Paragraph("SME Credit Memo", styles['Title']))
     elements.append(Spacer(1, 10))
 
-    # Executive Summary
     elements.append(Paragraph("Executive Summary", section))
-    elements.append(Paragraph(
-        f"The business presents a <b>{level}</b> credit risk profile with a score of <b>{score}</b>.",
-        normal))
-    elements.append(Spacer(1, 10))
+    elements.append(Paragraph(f"Risk Level: {level}, Score: {score}", styles["Normal"]))
 
-    # Financial Metrics
+    elements.append(Spacer(1, 10))
     elements.append(Paragraph("Financial Analysis", section))
-    elements.append(Paragraph(f"DSCR: {round(dscr,2)}", normal))
-    elements.append(Paragraph(f"Revenue Volatility: {round(volatility,2)}", normal))
-    elements.append(Spacer(1, 10))
-
-    # Risk Factors
-    elements.append(Paragraph("Risk Factors", section))
-    if explanations:
-        for e in explanations:
-            elements.append(Paragraph(f"- {e}", normal))
-    else:
-        elements.append(Paragraph("No major risk factors.", normal))
-    elements.append(Spacer(1, 10))
-
-    # Recommendation
-    elements.append(Paragraph("Lending Recommendation", section))
-
-    if level == "Low":
-        rec = "Eligible for standard lending terms."
-    elif level == "Moderate":
-        rec = "Conditional approval recommended."
-    else:
-        rec = "High risk. Further review required."
-
-    elements.append(Paragraph(rec, normal))
+    elements.append(Paragraph(f"DSCR: {round(dscr,2)}", styles["Normal"]))
+    elements.append(Paragraph(f"Volatility: {round(volatility,2)}", styles["Normal"]))
 
     doc.build(elements)
     buffer.seek(0)
     return buffer
 
 # -----------------------------
+# 📊 Core calculation function
+# -----------------------------
+def compute_metrics(df):
+    df["profit"] = df["revenue"] - df["expenses"]
+    df["cash_flow"] = df["profit"] - df["debt_payment"]
+
+    avg_cash = df["cash_flow"].mean()
+    debt = df["debt_payment"].mean()
+
+    dscr = avg_cash / debt if debt else 0
+    volatility = np.std(df["revenue"]) / np.mean(df["revenue"]) if np.mean(df["revenue"]) else 0
+
+    score = 100
+    explanations = []
+
+    if dscr < 1.2:
+        score -= 30
+        explanations.append("Low DSCR")
+
+    if volatility > 0.2:
+        score -= 20
+        explanations.append("High volatility")
+
+    if score >= 80:
+        level = "Low"
+    elif score >= 60:
+        level = "Moderate"
+    else:
+        level = "High"
+
+    return score, level, dscr, volatility, explanations, avg_cash
+
+# -----------------------------
 # 📤 Upload
 # -----------------------------
-uploaded_file = st.file_uploader("Upload CSV or Excel", type=["csv", "xlsx"])
+file = st.file_uploader("Upload CSV or Excel", type=["csv", "xlsx"])
 
-if uploaded_file:
-    try:
-        if uploaded_file.name.endswith(".csv"):
-            df = pd.read_csv(uploaded_file)
-        else:
-            df = pd.read_excel(uploaded_file)
+if file:
+    df = pd.read_csv(file) if file.name.endswith(".csv") else pd.read_excel(file)
+    df.columns = [c.lower().strip().replace(" ", "_") for c in df.columns]
 
-        df.columns = [c.lower().strip().replace(" ", "_") for c in df.columns]
+    if "debt_payment" not in df.columns:
+        df["debt_payment"] = 0
 
-        # simple mapping
-        df = df.rename(columns={
-            "income": "revenue",
-            "cost": "expenses"
-        })
+    # -----------------------------
+    # 📊 BASE METRICS
+    # -----------------------------
+    score, level, dscr, volatility, explanations, avg_cash = compute_metrics(df)
 
-        if "debt_payment" not in df.columns:
-            df["debt_payment"] = 0
+    # -----------------------------
+    # 🧭 Sidebar Scenario Controls
+    # -----------------------------
+    st.sidebar.header("⚙️ Scenario Simulator")
 
-        # calculations
-        df["profit"] = df["revenue"] - df["expenses"]
-        df["cash_flow"] = df["profit"] - df["debt_payment"]
+    rev_change = st.sidebar.slider("Revenue Change %", -50, 50, 0)
+    exp_change = st.sidebar.slider("Expense Change %", -50, 50, 0)
+    debt_change = st.sidebar.slider("Debt Change %", -50, 50, 0)
 
-        dscr = df["cash_flow"].mean() / df["debt_payment"].mean() if df["debt_payment"].mean() else 0
-        volatility = np.std(df["revenue"]) / np.mean(df["revenue"]) if np.mean(df["revenue"]) else 0
+    scenario_df = df.copy()
+    scenario_df["revenue"] *= (1 + rev_change/100)
+    scenario_df["expenses"] *= (1 + exp_change/100)
+    scenario_df["debt_payment"] *= (1 + debt_change/100)
 
-        score = 100
-        explanations = []
+    s_score, s_level, s_dscr, s_vol, s_exp, s_cash = compute_metrics(scenario_df)
 
-        if dscr < 1.2:
-            score -= 30
-            explanations.append("Low DSCR (cash flow pressure)")
+    # -----------------------------
+    # 📑 TABS
+    # -----------------------------
+    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧪 Simulator", "📄 Credit Memo"])
 
-        if volatility > 0.2:
-            score -= 20
-            explanations.append("High revenue volatility")
-
-        if score >= 80:
-            level = "Low"
-            color = "🟢"
-        elif score >= 60:
-            level = "Moderate"
-            color = "🟡"
-        else:
-            level = "High"
-            color = "🔴"
-
-        # -----------------------------
-        # UI Display (YOUR SECTION KEPT)
-        # -----------------------------
+    # =============================
+    # 📊 DASHBOARD
+    # =============================
+    with tab1:
         st.subheader("📈 Risk Summary")
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Risk Score", score)
-        col2.metric("DSCR", round(dscr, 2))
-        col3.metric("Volatility", round(volatility, 2))
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Risk Score", score)
+        c2.metric("DSCR", round(dscr, 2))
+        c3.metric("Volatility", round(volatility, 2))
 
-        st.markdown(f"### Risk Level: {color} {level}")
+        st.markdown(f"### Risk Level: **{level}**")
 
         st.subheader("📊 Revenue Trend")
         st.line_chart(df["revenue"])
 
         st.subheader("⚠️ Risk Factors")
-        if explanations:
-            for e in explanations:
-                st.warning(e)
-        else:
-            st.success("No major risk signals detected")
+        for e in explanations:
+            st.warning(e) if explanations else st.success("No risks")
 
-        # -----------------------------
-        # 📄 CLEAN CREDIT MEMO
-        # -----------------------------
+    # =============================
+    # 🧪 SIMULATOR
+    # =============================
+    with tab2:
+        st.subheader("🧪 Scenario Comparison")
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            st.markdown("### Base Case")
+            st.metric("Score", score)
+            st.metric("DSCR", round(dscr, 2))
+
+        with c2:
+            st.markdown("### Scenario Case")
+            st.metric("Score", s_score)
+            st.metric("DSCR", round(s_dscr, 2))
+
+        st.markdown("### 📉 Impact")
+
+        delta_score = s_score - score
+        st.write(f"Score Change: {delta_score}")
+
+        if s_level == "High":
+            st.error("Scenario leads to high risk")
+        elif s_level == "Moderate":
+            st.warning("Scenario increases risk")
+        else:
+            st.success("Scenario remains stable")
+
+    # =============================
+    # 📄 CREDIT MEMO + LOAN ENGINE
+    # =============================
+    with tab3:
         st.subheader("📄 Credit Memo")
 
         st.markdown(f"""
-**Executive Summary**  
-The business presents a **{level.lower()} risk profile** with a score of **{score}**.
-Based on available financial data, the company's ability to service debt obligations is evaluated through cash flow coverage and revenue stability.
-
-**Financial Analysis**  
-- DSCR: {round(dscr,2)}  
-- Revenue Volatility: {round(volatility,2)}
-
-**Interpretation**  
+**Risk Level:** {level}  
+**Score:** {score}
 """)
 
-        if level == "Low":
-            st.success("Strong financial condition and stable cash flow.")
-        elif level == "Moderate":
-            st.warning("Moderate risk. Some cash flow or stability concerns.")
-        else:
-            st.error("High risk. Debt repayment capacity may be weak.")
+        st.markdown("### 🏦 Lending Decision")
 
-        # -----------------------------
-        # 🏦 Lending Decision Engine
-        # -----------------------------
-        st.markdown("## 🏦 Lending Recommendation & Simulation")
-        
-        avg_revenue = df["revenue"].mean()
-        avg_cash_flow = df["cash_flow"].mean()
-        
-        # --- Base loan sizing logic ---
-        loan_multiplier = 3  # baseline multiple of monthly cash flow
-        max_loan = max(avg_cash_flow * loan_multiplier, 0)
-        
-        # --- Decision logic ---
+        loan = max(avg_cash * 3, 0)
+
         if level == "Low":
             decision = "Approved"
-            interest_rate = "6% – 10%"
-            term = "24–60 months"
-            conditions = [
-                "Standard underwriting review",
-                "No additional collateral required"
-            ]
-        
+            rate = "6–10%"
         elif level == "Moderate":
-            decision = "Conditionally Approved"
-            interest_rate = "10% – 16%"
-            term = "12–36 months"
-            conditions = [
-                "Provide additional financial documentation",
-                "Cash flow monitoring required",
-                "Possible personal guarantee"
-            ]
-            max_loan *= 0.7  # reduce exposure
-        
+            decision = "Conditional"
+            rate = "10–16%"
+            loan *= 0.7
         else:
-            decision = "Declined / High Risk"
-            interest_rate = "N/A"
-            term = "N/A"
-            conditions = [
-                "Insufficient cash flow coverage",
-                "Stabilize revenue before applying",
-                "Consider secured financing options"
-            ]
-            max_loan = 0
-        
-        # --- Display Decision ---
-        col1, col2 = st.columns(2)
-        
-        col1.markdown(f"""
-        ### Decision: **{decision}**
-        - **Estimated Max Loan:** ${int(max_loan):,}
-        - **Suggested Term:** {term}
-        """)
-        
-        col2.markdown(f"""
-        ### Pricing
-        - **Interest Rate Range:** {interest_rate}
-        - **Risk Level:** {level}
-        """)
-        
-        # --- Conditions ---
-        st.markdown("### 📋 Conditions / Notes")
-        for c in conditions:
-            st.write(f"- {c}")
-        
-        # -----------------------------
-        # 📊 Loan Stress Check
-        # -----------------------------
-        st.markdown("### 📉 Debt Capacity Check")
-        
-        if max_loan > 0:
-            estimated_monthly_payment = max_loan / 24  # simple estimate
-            coverage = avg_cash_flow / estimated_monthly_payment if estimated_monthly_payment else 0
-        
-            st.write(f"""
-            - Estimated Monthly Payment: ${int(estimated_monthly_payment):,}
-            - Cash Flow Coverage: {round(coverage,2)}
-            """)
-        
-            if coverage < 1.2:
-                st.warning("Loan may strain cash flow under current conditions.")
-            else:
-                st.success("Loan appears supportable based on current cash flow.")
+            decision = "Declined"
+            rate = "N/A"
+            loan = 0
 
-        # -----------------------------
-        # 📥 PDF DOWNLOAD
-        # -----------------------------
-        pdf = generate_pdf_report(score, level, dscr, volatility, explanations)
+        st.write(f"Decision: {decision}")
+        st.write(f"Max Loan: ${int(loan):,}")
+        st.write(f"Rate: {rate}")
 
         st.download_button(
-            "📄 Download Credit Memo (PDF)",
-            data=pdf,
-            file_name="credit_memo.pdf",
-            mime="application/pdf"
+            "📄 Download PDF",
+            data=generate_pdf(score, level, dscr, volatility),
+            file_name="credit_memo.pdf"
         )
-
-    except Exception as e:
-        st.error(f"Error: {e}")
