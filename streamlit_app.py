@@ -48,7 +48,7 @@ st.title("📊 SME Risk Analyzer")
 st.caption("Financial risk analysis, benchmarking, simulation, and lending decisions")
 
 # -----------------------------
-# Template
+# 📥 Template
 # -----------------------------
 template = """month,revenue,expenses,debt_payment
 Jan,80000,60000,10000
@@ -57,39 +57,35 @@ Feb,85000,62000,10000
 st.download_button("📥 Download Sample CSV", template, "sample.csv")
 
 # -----------------------------
-# Benchmark
+# 🏭 Benchmark
 # -----------------------------
 def get_industry_benchmark(industry):
     return {
         "General": {"dscr": 1.2, "volatility": 0.15},
         "Restaurant": {"dscr": 1.3, "volatility": 0.25},
         "Retail": {"dscr": 1.25, "volatility": 0.2},
-        "Real Estate": {"dscr": 1.2, "volatility": 0.1},
+        "SaaS": {"dscr": 1.1, "volatility": 0.1},
         "Construction": {"dscr": 1.4, "volatility": 0.3},
     }.get(industry, {"dscr":1.2,"volatility":0.15})
 
 # -----------------------------
-# PD
+# 📉 PD Model
 # -----------------------------
 def calculate_pd(score, dscr, volatility):
     pd = 0.02
     if dscr < 1.0: pd += 0.15
     elif dscr < 1.2: pd += 0.08
-
     if volatility > 0.25: pd += 0.12
     elif volatility > 0.15: pd += 0.06
-
     if score < 60: pd += 0.15
     elif score < 80: pd += 0.07
-
     return min(pd, 0.6)
 
 # -----------------------------
-# Metrics
+# 📊 Metrics
 # -----------------------------
 def compute_metrics(df):
-    df = df.copy()  # FIX: avoid mutation
-
+    df = df.copy()
     df["profit"] = df["revenue"] - df["expenses"]
     df["cash_flow"] = df["profit"] - df["debt_payment"]
 
@@ -120,7 +116,7 @@ def compute_metrics(df):
     return score, level, dscr, volatility, explanations, avg_cash
 
 # -----------------------------
-# Upload
+# 📤 Upload
 # -----------------------------
 file = st.file_uploader("Upload CSV or Excel", type=["csv", "xlsx"])
 
@@ -134,26 +130,26 @@ if file:
     score, level, dscr, volatility, explanations, avg_cash = compute_metrics(df)
 
     # -----------------------------
-    # Sidebar Controls
+    # Sidebar
     # -----------------------------
     st.sidebar.title("⚙️ Controls")
 
     rev = st.sidebar.slider("Revenue %", -50, 50, 0)
     exp = st.sidebar.slider("Expense %", -50, 50, 0)
-    debt = st.sidebar.slider("Debt %", -50, 50, 0)
+    debt_change = st.sidebar.slider("Debt %", -50, 50, 0)
 
     industry = st.sidebar.selectbox(
         "Select Industry",
-        ["General","Restaurant","Retail","Real Estate","Construction"]
+        ["General","Restaurant","Retail","SaaS","Construction"]
     )
 
     benchmark = get_industry_benchmark(industry)
 
-    # Scenario (sidebar-driven)
+    # Sidebar simulation
     sim_df = df.copy()
     sim_df["revenue"] *= (1 + rev / 100)
     sim_df["expenses"] *= (1 + exp / 100)
-    sim_df["debt_payment"] *= (1 + debt / 100)
+    sim_df["debt_payment"] *= (1 + debt_change / 100)
 
     s_score, s_level, s_dscr, s_vol, _, _ = compute_metrics(sim_df)
 
@@ -166,7 +162,7 @@ if file:
     tab1, tab2, tab3 = st.tabs(["Dashboard", "Simulator", "Credit Memo"])
 
     # =============================
-    # Dashboard
+    # DASHBOARD
     # =============================
     with tab1:
         st.markdown('<div class="section-title">📊 Key Metrics</div>', unsafe_allow_html=True)
@@ -188,22 +184,19 @@ if file:
         st.write(f"DSCR: {dscr:.2f} vs {benchmark['dscr']:.2f}")
         st.write(f"Volatility: {volatility:.2f} vs {benchmark['volatility']:.2f}")
 
-        # moved trend HERE (fix #9)
         st.markdown('<div class="section-title">📈 Revenue Trend</div>', unsafe_allow_html=True)
         st.line_chart(df["revenue"])
 
     # =============================
-    # Simulator
+    # SIMULATOR
     # =============================
     with tab2:
         st.subheader("🧪 Advanced Scenario Simulator")
 
-        st.caption("Note: Sidebar sliders = primary simulation. Below presets = quick scenarios.")
+        st.caption("Sidebar sliders = primary simulation | Presets = quick override")
 
-        scenario = st.selectbox(
-            "Scenario Preset",
-            ["Base", "Mild Stress", "Severe Stress", "Expense Shock"]
-        )
+        scenario = st.selectbox("Scenario",
+            ["Base", "Mild Stress", "Severe Stress", "Expense Shock"])
 
         temp = df.copy()
         if scenario == "Mild Stress":
@@ -234,7 +227,7 @@ if file:
         else:
             st.error("Declined")
 
-        # Sensitivity FIX (#6)
+        # sensitivity fix
         x = np.linspace(0.5,1.5,20)
         y=[]
         for r in x:
@@ -248,9 +241,12 @@ if file:
         st.subheader("💡 Improve Approval")
 
         tips=[]
-        if sc_dscr<1.2: tips.append("Increase revenue or reduce loan")
-        if sc_vol>0.2: tips.append("Stabilize income")
+        if sc_dscr<1.2: tips.append("Increase revenue or reduce loan size")
+        if sc_vol>0.2: tips.append("Stabilize revenue streams")
         if sc_level=="High": tips.append("Reduce risk exposure")
+        if cov<1.2: tips.append("Lower loan amount to improve coverage")
+        if benchmark and dscr < benchmark["dscr"]:
+            tips.append("Improve DSCR to meet industry benchmark")
 
         if tips:
             for t in tips:
@@ -259,7 +255,7 @@ if file:
             st.success("No major improvements needed")
 
     # =============================
-    # Credit Memo
+    # CREDIT MEMO
     # =============================
     with tab3:
         st.markdown('<div class="section-title">📄 Credit Memo</div>', unsafe_allow_html=True)
@@ -267,6 +263,7 @@ if file:
         st.markdown('<div class="card-light">Executive Summary</div>', unsafe_allow_html=True)
         st.write(f"""
 The business presents a **{level} risk profile** with a risk score of **{score:,}**.
+This reflects revenue stability, debt coverage, and overall financial health.
 """)
 
         st.markdown("### 📊 Key Metrics")
@@ -277,7 +274,13 @@ The business presents a **{level} risk profile** with a risk score of **{score:,
         col_c.metric("Volatility", f"{volatility:.2f}")
 
         pd_val = calculate_pd(score, dscr, volatility)
-        st.metric("PD", f"{pd_val*100:.1f}%")
+        st.metric("Probability of Default (PD)", f"{pd_val*100:.1f}%")
+
+        st.markdown("""
+- DSCR > 1.2 = healthy  
+- Low volatility = stable income  
+- PD = likelihood of default  
+""")
 
         st.markdown('<div class="section-title">⚠️ Risk Signals</div>', unsafe_allow_html=True)
         if explanations:
@@ -294,28 +297,28 @@ The business presents a **{level} risk profile** with a risk score of **{score:,
             decision, rate, term = "Approved", "6–10%", "24–60 months"
             conditions = ["Standard underwriting review"]
         elif level == "Moderate":
-            decision, rate, term = "Conditional", "10–16%", "12–36 months"
+            decision, rate, term = "Conditionally Approved", "10–16%", "12–36 months"
             baseline *= 0.7
-            conditions = ["Additional documentation required"]
+            conditions = ["Provide additional documentation"]
         else:
             decision, rate, term = "Declined", "N/A", "N/A"
             baseline = 0
             conditions = ["Improve financial stability"]
 
-        c1, c2 = st.columns(2)
+        col1, col2 = st.columns(2)
 
-        with c1:
+        with col1:
             st.markdown(f"""
 ### Decision: **{decision}**
 - Loan: ${baseline:,.0f}
 - Term: {term}
 """)
 
-        with c2:
+        with col2:
             st.markdown(f"""
 ### Pricing
 - Rate: {rate}
-- Risk: {level}
+- Risk Level: {level}
 """)
 
         st.markdown("### 📋 Conditions")
