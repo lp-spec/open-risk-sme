@@ -47,11 +47,10 @@ def get_industry_benchmark(industry):
     }.get(industry)
 
 # -----------------------------
-# 📉 Probability of Default
+# 📉 PD Model
 # -----------------------------
 def calculate_pd(score, dscr, volatility):
     pd = 0.02
-
     if dscr < 1.0: pd += 0.15
     elif dscr < 1.2: pd += 0.08
 
@@ -81,18 +80,15 @@ def compute_metrics(df):
 
     if dscr < 1.2:
         score -= 30
-        explanations.append(("Low DSCR: cash flow may not cover debt payments", "red"))
+        explanations.append(("Low DSCR: weak debt coverage", "red"))
 
     if volatility > 0.2:
         score -= 20
-        explanations.append(("High revenue volatility: income is unstable", "yellow"))
+        explanations.append(("High revenue volatility", "yellow"))
 
-    if score >= 80:
-        level = "Low"
-    elif score >= 60:
-        level = "Moderate"
-    else:
-        level = "High"
+    if score >= 80: level = "Low"
+    elif score >= 60: level = "Moderate"
+    else: level = "High"
 
     return score, level, dscr, volatility, explanations, avg_cash
 
@@ -115,14 +111,14 @@ if file:
     # -----------------------------
     st.sidebar.header("🧪 Scenario Simulator")
 
-    rev_change = st.sidebar.slider("Revenue Change %", -50, 50, 0)
-    exp_change = st.sidebar.slider("Expense Change %", -50, 50, 0)
-    debt_change = st.sidebar.slider("Debt Change %", -50, 50, 0)
+    rev = st.sidebar.slider("Revenue Change %", -50, 50, 0)
+    exp = st.sidebar.slider("Expense Change %", -50, 50, 0)
+    debt = st.sidebar.slider("Debt Change %", -50, 50, 0)
 
     sim_df = df.copy()
-    sim_df["revenue"] *= (1 + rev_change / 100)
-    sim_df["expenses"] *= (1 + exp_change / 100)
-    sim_df["debt_payment"] *= (1 + debt_change / 100)
+    sim_df["revenue"] *= (1 + rev / 100)
+    sim_df["expenses"] *= (1 + exp / 100)
+    sim_df["debt_payment"] *= (1 + debt / 100)
 
     s_score, s_level, *_ = compute_metrics(sim_df)
 
@@ -136,112 +132,107 @@ if file:
     benchmark = get_industry_benchmark(industry)
 
     # -----------------------------
-    # 📊 Dashboard
+    # 📑 TABS RESTORED
     # -----------------------------
-    st.subheader("📈 Risk Summary")
+    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧪 Simulator", "📄 Credit Memo"])
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Risk Score", f"{score:,}")
-    c2.metric("DSCR", round(dscr, 2))
-    c3.metric("Volatility", round(volatility, 2))
+    # =============================
+    # 📊 DASHBOARD
+    # =============================
+    with tab1:
+        st.subheader("📈 Risk Summary")
 
-    st.markdown(f"### Risk Level: **{level}**")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Risk Score", f"{score:,}")
+        c2.metric("DSCR", round(dscr,2))
+        c3.metric("Volatility", round(volatility,2))
 
-    st.markdown("""
-### 📘 What These Mean
-- **DSCR (Debt Service Coverage Ratio)**  
-  Measures ability to pay debt  
-  > Above 1.2 = healthy  
+        st.markdown(f"### Risk Level: **{level}**")
 
-- **Volatility**  
-  Measures stability of income  
-  > Lower = more predictable  
+        st.markdown("""
+**Definitions:**
+- DSCR > 1.2 = healthy  
+- Volatility < 0.15 = stable  
 """)
 
-    st.subheader("📊 Revenue Trend")
-    st.line_chart(df["revenue"])
+        st.subheader("📊 Revenue Trend")
+        st.line_chart(df["revenue"])
 
-    # -----------------------------
-    # 🏦 Risk Panel (Cards)
-    # -----------------------------
-    st.subheader("🏦 Risk Alerts")
+        st.subheader("🏦 Risk Alerts")
 
-    if explanations:
-        for text, color in explanations:
-            st.markdown(f'<div class="card {color}">{text}</div>', unsafe_allow_html=True)
-    else:
-        st.markdown('<div class="card green">No major risks detected</div>', unsafe_allow_html=True)
+        if explanations:
+            for text, color in explanations:
+                st.markdown(f'<div class="card {color}">{text}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="card green">No major risks</div>', unsafe_allow_html=True)
 
-    # -----------------------------
-    # 🏭 Benchmark
-    # -----------------------------
-    st.subheader("🏭 Industry Comparison")
+        st.subheader("🏭 Industry Comparison")
+        st.write(f"Your DSCR: {round(dscr,2)} vs {benchmark['dscr']}")
+        st.write(f"Your Volatility: {round(volatility,2)} vs {benchmark['volatility']}")
 
-    st.write(f"Your DSCR: {round(dscr,2)} | Industry: {benchmark['dscr']}")
-    st.write(f"Your Volatility: {round(volatility,2)} | Industry: {benchmark['volatility']}")
+    # =============================
+    # 🧪 SIMULATOR TAB
+    # =============================
+    with tab2:
+        st.subheader("Scenario Comparison")
 
-    # -----------------------------
-    # 📉 PD
-    # -----------------------------
-    pd_val = calculate_pd(score, dscr, volatility)
+        st.metric("Base Score", score)
+        st.metric("Scenario Score", s_score)
 
-    st.subheader("📉 Probability of Default")
+    # =============================
+    # 📄 CREDIT MEMO TAB RESTORED
+    # =============================
+    with tab3:
+        st.subheader("📄 Credit Memo")
 
-    st.metric("Estimated Default Risk", f"{round(pd_val*100,1)}%")
+        st.write(f"Risk Level: {level} | Score: {score}")
 
-    st.markdown("""
-- < 5% → Low risk  
-- 5–15% → Moderate  
-- 15%+ → High  
+        pd_val = calculate_pd(score, dscr, volatility)
+        st.metric("Probability of Default", f"{pd_val*100:.1f}%")
+
+        st.markdown("""
+**What this means:**
+- <5% = low risk  
+- 5–15% = moderate  
+- >15% = high  
 """)
 
-    # -----------------------------
-    # 🏦 Lending Simulation
-    # -----------------------------
-    st.subheader("🏦 Loan Simulation")
+        # -----------------------------
+        # 🏦 Lending Simulation
+        # -----------------------------
+        st.subheader("🏦 Loan Simulation")
 
-    baseline = max(avg_cash * 3, 0)
+        baseline = max(avg_cash * 3, 0)
 
-    loan_slider = st.slider("Loan Amount (Slider)", 0, int(max(baseline*2,10000)), int(baseline), step=1000)
-    loan_input = st.number_input("Loan Amount (Manual)", value=int(loan_slider), step=1000)
+        loan_slider = st.slider("Loan Amount (Slider)", 0, int(baseline*2), int(baseline), step=1000)
+        loan = st.number_input("Loan Amount (Manual)", value=int(loan_slider), step=1000)
 
-    loan = loan_input
+        collateral_slider = st.slider("Collateral (Slider)", 0, int(baseline*2), int(baseline*0.5), step=1000)
+        collateral = st.number_input("Collateral (Manual)", value=int(collateral_slider), step=1000)
 
-    collateral_slider = st.slider("Collateral (Slider)", 0, int(max(baseline*2,10000)), int(baseline*0.5), step=1000)
-    collateral_input = st.number_input("Collateral (Manual)", value=int(collateral_slider), step=1000)
+        term = st.selectbox("Loan Term", [12,24,36,48,60])
 
-    collateral = collateral_input
+        payment = loan / term if term else 0
+        coverage = avg_cash / payment if payment else 0
+        ltv = loan / collateral if collateral else 999
 
-    term = st.selectbox("Loan Term", [12,24,36,48,60])
-
-    payment = loan / term if term else 0
-    coverage = avg_cash / payment if payment else 0
-    ltv = loan / collateral if collateral else 999
-
-    st.markdown("""
-### 📘 Loan Metrics Explained
-- **Coverage Ratio** → ability to pay loan  
-- **LTV (Loan-to-Value)** → loan vs collateral  
+        st.markdown("""
+- Coverage >1.2 = safe  
+- LTV <0.9 = safe  
 """)
 
-    decision = "Approved"
+        decision = "Approved"
 
-    if coverage < 1.0 or ltv > 1.2 or level == "High":
-        decision = "Declined"
-    elif coverage < 1.2 or ltv > 0.9:
-        decision = "Conditional"
+        if coverage < 1.0 or ltv > 1.2 or level == "High":
+            decision = "Declined"
+        elif coverage < 1.2 or ltv > 0.9:
+            decision = "Conditional"
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Decision", decision)
-    col2.metric("Monthly Payment", f"${payment:,.0f}")
-    col3.metric("Coverage", round(coverage,2))
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Decision", decision)
+        col2.metric("Payment", f"${payment:,.0f}")
+        col3.metric("Coverage", round(coverage,2))
 
-    col4, col5 = st.columns(2)
-    col4.metric("LTV", round(ltv,2))
-
-    if decision == "Approved":
-        col5.metric("Rate", "6–10%")
-    elif decision == "Conditional":
-        col5.metric("Rate", "10–16%")
-    else:
-        col5.metric("Rate", "N/A")
+        col4, col5 = st.columns(2)
+        col4.metric("LTV", round(ltv,2))
+        col5.metric("Rate", "6–16%" if decision != "Declined" else "N/A")
