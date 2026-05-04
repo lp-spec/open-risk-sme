@@ -151,8 +151,11 @@ if file:
         st.line_chart(df["revenue"])
 
         st.subheader("⚠️ Risk Factors")
-        for e in explanations:
-            st.warning(e) if explanations else st.success("No risks")
+        if explanations:
+            for e in explanations:
+                st.warning(f"⚠️ {e}")
+        else:
+            st.success("✅ No major risk signals detected")
 
     # =============================
     # 🧪 SIMULATOR
