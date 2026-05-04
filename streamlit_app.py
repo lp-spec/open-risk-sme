@@ -2,13 +2,17 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import io
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 
 st.set_page_config(page_title="SME Risk Analyzer", layout="wide")
 
 st.title("📊 SME Risk Analyzer")
 st.caption("Turn financial data into lender-ready risk insights")
 
-# --- Download template ---
+# -----------------------------
+# 📥 Download Template
+# -----------------------------
 template = """month,revenue,expenses,debt_payment
 Jan,80000,60000,10000
 Feb,85000,62000,10000
@@ -23,60 +27,122 @@ st.download_button(
     mime="text/csv"
 )
 
-# --- File upload ---
-uploaded_file = st.file_uploader("Upload your financial CSV", type=["csv"])
+# -----------------------------
+# 📄 PDF Generator
+# -----------------------------
+def generate_pdf_report(data):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer)
+    styles = getSampleStyleSheet()
+
+    elements = []
+    elements.append(Paragraph("SME Credit Risk Report", styles['Title']))
+    elements.append(Spacer(1, 12))
+
+    for key, value in data.items():
+        elements.append(Paragraph(f"{key}: {value}", styles['Normal']))
+        elements.append(Spacer(1, 10))
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+# -----------------------------
+# 📤 File Upload
+# -----------------------------
+uploaded_file = st.file_uploader("Upload your financial file (CSV or Excel)", type=["csv", "xlsx"])
 
 if uploaded_file:
     try:
-        df = pd.read_csv(uploaded_file)
+        file_name = uploaded_file.name.lower()
 
-        # --- Normalize column names ---
-        df.columns = [col.strip().lower() for col in df.columns]
+        # Load file
+        if file_name.endswith(".csv"):
+            df = pd.read_csv(uploaded_file)
+        elif file_name.endswith(".xlsx"):
+            df = pd.read_excel(uploaded_file)
+        else:
+            st.error("Unsupported file type.")
+            st.stop()
 
-        # --- Column alias mapping ---
+        # -----------------------------
+        # 🧠 Normalize Column Names
+        # -----------------------------
+        df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
+
+        # -----------------------------
+        # 🔍 Column Mapping
+        # -----------------------------
         column_map = {
-            "revenue": ["revenue", "income", "total_income", "sales"],
-            "expenses": ["expenses", "cost", "costs", "operating_expenses"],
-            "debt_payment": ["debt_payment", "loan_payment", "debt", "payment"]
+            "revenue": [
+                "revenue", "income", "total_income", "sales",
+                "deposit", "credits", "inflow"
+            ],
+            "expenses": [
+                "expenses", "cost", "costs", "operating_expenses",
+                "withdrawal", "debits", "outflow"
+            ],
+            "debt_payment": [
+                "debt_payment", "loan_payment", "debt", "payment",
+                "interest_payment", "principal_payment"
+            ]
         }
 
         def find_column(possible_names):
-            for name in possible_names:
-                if name in df.columns:
-                    return name
+            for col in df.columns:
+                for name in possible_names:
+                    if name in col:
+                        return col
             return None
 
         rev_col = find_column(column_map["revenue"])
         exp_col = find_column(column_map["expenses"])
         debt_col = find_column(column_map["debt_payment"])
 
-        # --- Validate required columns ---
-        if not rev_col or not exp_col or not debt_col:
-            st.error(
-                "❌ Missing required columns.\n\n"
-                "Please include columns for revenue, expenses, and debt payment.\n\n"
-                "Tip: Download the template above."
-            )
+        # -----------------------------
+        # 🟡 QuickBooks Fallback
+        # -----------------------------
+        if not rev_col and "total_income" in df.columns:
+            rev_col = "total_income"
+
+        if not exp_col and "total_expenses" in df.columns:
+            exp_col = "total_expenses"
+
+        if not debt_col:
+            df["debt_payment"] = 0
+            debt_col = "debt_payment"
+
+        # -----------------------------
+        # ❌ Validation
+        # -----------------------------
+        if not rev_col or not exp_col:
+            st.error("Missing required financial columns (revenue / expenses).")
             st.stop()
 
-        # --- Rename to standard ---
+        # Rename to standard
         df = df.rename(columns={
             rev_col: "revenue",
             exp_col: "expenses",
             debt_col: "debt_payment"
         })
 
-        st.success(f"✅ Detected columns → revenue: {rev_col}, expenses: {exp_col}, debt: {debt_col}")
+        st.success(f"Detected columns → revenue: {rev_col}, expenses: {exp_col}, debt: {debt_col}")
 
-        # --- Show raw data ---
+        # -----------------------------
+        # 📁 Show Data
+        # -----------------------------
         st.subheader("📁 Uploaded Data")
         st.dataframe(df)
 
-        # --- Normalize ---
+        # -----------------------------
+        # ⚙️ Normalize
+        # -----------------------------
         df["profit"] = df["revenue"] - df["expenses"]
         df["cash_flow"] = df["profit"] - df["debt_payment"]
 
-        # --- Risk calculations ---
+        # -----------------------------
+        # 📊 Risk Calculation
+        # -----------------------------
         avg_cash = df["cash_flow"].mean()
         debt = df["debt_payment"].mean()
 
@@ -88,13 +154,15 @@ if uploaded_file:
 
         if dscr < 1.2:
             score -= 30
-            explanations.append("Low DSCR (cash flow may not sufficiently cover debt obligations)")
+            explanations.append("Low DSCR (cash flow may not cover debt obligations)")
 
         if volatility > 0.2:
             score -= 20
-            explanations.append("High revenue volatility (unstable income patterns)")
+            explanations.append("High revenue volatility (unstable income)")
 
-        # --- Risk level ---
+        # -----------------------------
+        # 🎯 Risk Level
+        # -----------------------------
         if score >= 80:
             level = "Low"
             color = "🟢"
@@ -105,7 +173,9 @@ if uploaded_file:
             level = "High"
             color = "🔴"
 
-        # --- Display metrics ---
+        # -----------------------------
+        # 📈 UI Display
+        # -----------------------------
         st.subheader("📈 Risk Summary")
 
         col1, col2, col3 = st.columns(3)
@@ -115,11 +185,11 @@ if uploaded_file:
 
         st.markdown(f"### Risk Level: {color} {level}")
 
-        # --- Chart ---
+        # Chart
         st.subheader("📊 Revenue Trend")
         st.line_chart(df["revenue"])
 
-        # --- Explanations ---
+        # Risk factors
         st.subheader("⚠️ Risk Factors")
         if explanations:
             for e in explanations:
@@ -127,15 +197,37 @@ if uploaded_file:
         else:
             st.success("No major risk signals detected")
 
-        # --- Final Report ---
+        # -----------------------------
+        # 📄 Summary JSON
+        # -----------------------------
         st.subheader("📄 Summary Report")
-        st.json({
+        result = {
             "risk_score": score,
             "risk_level": level,
             "dscr": round(dscr, 2),
             "volatility": round(volatility, 2),
             "explanations": explanations
+        }
+
+        st.json(result)
+
+        # -----------------------------
+        # 📥 PDF Download
+        # -----------------------------
+        pdf_file = generate_pdf_report({
+            "Risk Score": score,
+            "Risk Level": level,
+            "DSCR": round(dscr, 2),
+            "Volatility": round(volatility, 2),
+            "Explanations": ", ".join(explanations) if explanations else "None"
         })
 
+        st.download_button(
+            label="📄 Download Credit Report (PDF)",
+            data=pdf_file,
+            file_name="risk_report.pdf",
+            mime="application/pdf"
+        )
+
     except Exception as e:
-        st.error(f"⚠️ Error processing file: {str(e)}")
+        st.error(f"Error processing file: {str(e)}")
