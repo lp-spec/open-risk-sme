@@ -198,126 +198,126 @@ if uploaded_file:
             st.success("No major risk signals detected")
 
         # -----------------------------
-        # 📄 Summary JSON
+        # 📄 CREDIT MEMO
         # -----------------------------
-st.subheader("📄 Credit Memo (Lender View)")
-
-# -----------------------------
-# 🧾 Executive Summary
-# -----------------------------
-st.markdown("## 🧾 Executive Summary")
-
-st.markdown(f"""
-The business demonstrates a **{level.lower()} level of credit risk** with a composite risk score of **{score}**.  
-Based on available financial data, the company's ability to service debt obligations is evaluated through cash flow coverage and revenue stability.
-""")
-
-# -----------------------------
-# 📊 Financial Analysis
-# -----------------------------
-st.markdown("## 📊 Financial Analysis")
-
-col1, col2 = st.columns(2)
-
-col1.markdown(f"""
-**Debt Service Coverage Ratio (DSCR):**  
-**{round(dscr, 2)}**
-
-This metric evaluates the company's ability to cover debt payments using operating cash flow.
-""")
-
-col2.markdown(f"""
-**Revenue Volatility:**  
-**{round(volatility, 2)}**
-
-This reflects stability of income over time. Higher volatility indicates greater uncertainty.
-""")
-
-# -----------------------------
-# ⚠️ Risk Factors
-# -----------------------------
-st.markdown("## ⚠️ Key Risk Factors")
-
-if explanations:
-    for e in explanations:
-        st.markdown(f"- {e}")
-else:
-    st.markdown("- No significant risk factors identified")
-
-# -----------------------------
-# 🧠 Credit Interpretation
-# -----------------------------
-st.markdown("## 🧠 Credit Interpretation")
-
-if level == "Low":
-    st.success("""
-The business demonstrates strong financial performance and stable cash flow generation.  
-Risk of default is considered low under current conditions.
-""")
-
-elif level == "Moderate":
-    st.warning("""
-The business shows moderate risk characteristics.  
-Cash flow coverage or revenue consistency may present some constraints under stress scenarios.
-""")
-
-else:
-    st.error("""
-The business presents elevated credit risk.  
-Weak cash flow coverage or unstable revenue trends may impact debt repayment capacity.
-""")
-
-# -----------------------------
-# 🏦 Lending Consideration
-# -----------------------------
-st.markdown("## 🏦 Lending Consideration")
-
-if level == "Low":
-    st.markdown("""
-**Recommendation:** Eligible for standard lending terms.
-
-- Typical approval likely  
-- Competitive interest rates  
-- Minimal additional conditions
-""")
-
-elif level == "Moderate":
-    st.markdown("""
-**Recommendation:** Conditional approval.
-
-- May require higher interest rate  
-- Additional documentation recommended  
-- Monitoring of cash flow stability advised
-""")
-
-else:
-    st.markdown("""
-**Recommendation:** High caution.
-
-- Approval unlikely without strong compensating factors  
-- May require collateral or guarantees  
-- Further due diligence strongly recommended
-""")
-
-# -----------------------------
-# 📌 Final Summary Box
-# -----------------------------
-st.markdown("---")
-st.markdown(f"""
-### 📌 Final Risk Rating: **{level} ({score})**
-""")
-
-# -----------------------------
-# 🔍 Optional Raw Data
-# -----------------------------
-with st.expander("🔍 View Technical Details"):
-    st.json({
-        "risk_score": score,
-        "risk_level": level,
-        "dscr": round(dscr, 2),
-        "volatility": round(volatility, 2),
-        "explanations": explanations
-    })
+        st.subheader("📄 Credit Memo (Lender View)")
+        
+        # -----------------------------
+        # 🧾 Executive Summary
+        # -----------------------------
+        st.markdown("## 🧾 Executive Summary")
+        
+        st.markdown(f"""
+        The business demonstrates a **{level.lower()} level of credit risk** with a composite risk score of **{score}**.  
+        Based on available financial data, the company's ability to service debt obligations is evaluated through cash flow coverage and revenue stability.
+        """)
+        
+        # -----------------------------
+        # 📊 Financial Analysis
+        # -----------------------------
+        st.markdown("## 📊 Financial Analysis")
+        
+        col1, col2 = st.columns(2)
+        
+        col1.markdown(f"""
+        **Debt Service Coverage Ratio (DSCR):**  
+        **{round(dscr, 2)}**
+        
+        This metric evaluates the company's ability to cover debt payments using operating cash flow.
+        """)
+        
+        col2.markdown(f"""
+        **Revenue Volatility:**  
+        **{round(volatility, 2)}**
+        
+        This reflects stability of income over time. Higher volatility indicates greater uncertainty.
+        """)
+        
+        # -----------------------------
+        # ⚠️ Risk Factors
+        # -----------------------------
+        st.markdown("## ⚠️ Key Risk Factors")
+        
+        if explanations:
+            for e in explanations:
+                st.markdown(f"- {e}")
+        else:
+            st.markdown("- No significant risk factors identified")
+        
+        # -----------------------------
+        # 🧠 Credit Interpretation
+        # -----------------------------
+        st.markdown("## 🧠 Credit Interpretation")
+        
+        if level == "Low":
+            st.success("""
+        The business demonstrates strong financial performance and stable cash flow generation.  
+        Risk of default is considered low under current conditions.
+        """)
+        
+        elif level == "Moderate":
+            st.warning("""
+        The business shows moderate risk characteristics.  
+        Cash flow coverage or revenue consistency may present some constraints under stress scenarios.
+        """)
+        
+        else:
+            st.error("""
+        The business presents elevated credit risk.  
+        Weak cash flow coverage or unstable revenue trends may impact debt repayment capacity.
+        """)
+        
+        # -----------------------------
+        # 🏦 Lending Consideration
+        # -----------------------------
+        st.markdown("## 🏦 Lending Consideration")
+        
+        if level == "Low":
+            st.markdown("""
+        **Recommendation:** Eligible for standard lending terms.
+        
+        - Typical approval likely  
+        - Competitive interest rates  
+        - Minimal additional conditions
+        """)
+        
+        elif level == "Moderate":
+            st.markdown("""
+        **Recommendation:** Conditional approval.
+        
+        - May require higher interest rate  
+        - Additional documentation recommended  
+        - Monitoring of cash flow stability advised
+        """)
+        
+        else:
+            st.markdown("""
+        **Recommendation:** High caution.
+        
+        - Approval unlikely without strong compensating factors  
+        - May require collateral or guarantees  
+        - Further due diligence strongly recommended
+        """)
+        
+        # -----------------------------
+        # 📌 Final Summary Box
+        # -----------------------------
+        st.markdown("---")
+        st.markdown(f"""
+        ### 📌 Final Risk Rating: **{level} ({score})**
+        """)
+        
+        # -----------------------------
+        # 🔍 Optional Raw Data
+        # -----------------------------
+        with st.expander("🔍 View Technical Details"):
+            st.json({
+                "risk_score": score,
+                "risk_level": level,
+                "dscr": round(dscr, 2),
+                "volatility": round(volatility, 2),
+                "explanations": explanations
+            })
         # -----------------------------
         # 📥 PDF Download
         # -----------------------------
