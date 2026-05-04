@@ -9,16 +9,51 @@ st.set_page_config(page_title="SME Risk Analyzer", layout="wide")
 # -----------------------------
 st.markdown("""
 <style>
-.card {
+/* Page */
+.block-container {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: #111827;
+    color: white;
+}
+
+/* KPI Cards */
+.kpi {
+    padding: 18px;
+    border-radius: 12px;
+    background: #f9fafb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Section headers */
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Subtle card */
+.card-light {
     padding: 15px;
     border-radius: 10px;
-    color: white;
-    font-weight: 500;
-    margin-bottom:10px;
+    background: #f3f4f6;
 }
-.green {background-color: #2ecc71;}
-.yellow {background-color: #f1c40f; color:black;}
-.red {background-color: #e74c3c;}
+
+/* Risk cards */
+.card {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+.green {background:#d1fae5; color:#065f46;}
+.yellow {background:#fef3c7; color:#92400e;}
+.red {background:#fee2e2; color:#991b1b;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -112,11 +147,18 @@ if file:
     # -----------------------------
     # 🧪 Sidebar Simulator
     # -----------------------------
-    st.sidebar.header("🧪 Scenario Simulator")
-
-    rev = st.sidebar.slider("Revenue Change %", -50, 50, 0)
-    exp = st.sidebar.slider("Expense Change %", -50, 50, 0)
-    debt = st.sidebar.slider("Debt Change %", -50, 50, 0)
+    st.sidebar.title("⚙️ Controls")
+    
+    st.sidebar.markdown("### Scenario")
+    rev = st.sidebar.slider("Revenue %", -50, 50, 0)
+    exp = st.sidebar.slider("Expense %", -50, 50, 0)
+    debt = st.sidebar.slider("Debt %", -50, 50, 0)
+    
+    st.sidebar.markdown("### Industry")
+    industry = st.sidebar.selectbox(
+        "Select Industry",
+        ["General","Restaurant","Retail","Real Estate","Construction"]
+    )
 
     sim_df = df.copy()
     sim_df["revenue"] *= (1 + rev / 100)
@@ -129,26 +171,28 @@ if file:
     st.sidebar.write(f"Scenario Risk: {s_level}")
 
     # -----------------------------
-    # Industry
+    # Industry - not using this for now
     # -----------------------------
-    industry = st.selectbox("Select Industry", ["General","Restaurant","Retail","SaaS","Construction"])
-    benchmark = get_industry_benchmark(industry)
+    # industry = st.selectbox("Select Industry", ["General","Restaurant","Retail","SaaS","Construction"])
+    # benchmark = get_industry_benchmark(industry)
 
     # -----------------------------
     # Tabs
     # -----------------------------
-    tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧪 Simulator", "📄 Credit Memo"])
+    tab1, tab2, tab3 = st.tabs(["Dashboard", "Simulator", "Credit Memo"])
 
     # =============================
     # DASHBOARD
     # =============================
     with tab1:
-        st.subheader("📈 Risk Summary")
-
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Risk Score", f"{score:,}")
-        c2.metric("DSCR", round(dscr,2))
-        c3.metric("Volatility", round(volatility,2))
+        st.markdown('<div class="section-title">📊 Key Metrics</div>', unsafe_allow_html=True)
+        
+        c1, c2, c3, c4 = st.columns(4)
+        
+        c1.markdown(f'<div class="kpi"><b>Risk Score</b><br>{score:,}</div>', unsafe_allow_html=True)
+        c2.markdown(f'<div class="kpi"><b>DSCR</b><br>{dscr:.2f}</div>', unsafe_allow_html=True)
+        c3.markdown(f'<div class="kpi"><b>Volatility</b><br>{volatility:.2f}</div>', unsafe_allow_html=True)
+        c4.markdown(f'<div class="kpi"><b>PD</b><br>{calculate_pd(score, dscr, volatility)*100:.1f}%</div>', unsafe_allow_html=True)
 
         st.subheader("🏦 Risk Alerts")
         if explanations:
@@ -228,12 +272,13 @@ if file:
     # CREDIT MEMO
     # =============================
     with tab3:
-        st.subheader("📄 Credit Memo")
+        #st.subheader("📄 Credit Memo") not using this for now
+        st.markdown('<div class="section-title">📄 Credit Memo</div>', unsafe_allow_html=True)
     
         # -----------------------------
         # 🧾 Executive Summary
         # -----------------------------
-        st.markdown("### 🧾 Executive Summary")
+        st.markdown('<div class="card-light">Executive Summary</div>', unsafe_allow_html=True)
     
         st.write(f"""
     The business presents a **{level} risk profile** with a risk score of **{score:,}**.
@@ -265,13 +310,13 @@ if file:
         # -----------------------------
         # 🏦 Risk Factors (Bank Style)
         # -----------------------------
-        st.markdown("### 🏦 Key Risk Factors")
-    
+        st.markdown('<div class="section-title">⚠️ Risk Signals</div>', unsafe_allow_html=True)
+        
         if explanations:
             for text, color in explanations:
                 st.markdown(f'<div class="card {color}">{text}</div>', unsafe_allow_html=True)
         else:
-            st.markdown('<div class="card green">No major risk signals detected</div>', unsafe_allow_html=True)
+            st.markdown('<div class="card green">No major risk detected</div>', unsafe_allow_html=True)
     
         # -----------------------------
         # 🧠 Interpretation
@@ -288,7 +333,7 @@ if file:
         # -----------------------------
         # 🏦 Lending Recommendation (FULL)
         # -----------------------------
-        st.markdown("### 🏦 Lending Recommendation")
+        st.markdown('<div class="card-light">Lending Recommendation")</div>', unsafe_allow_html=True)
     
         baseline = max(avg_cash * 3, 0)
     
@@ -323,7 +368,17 @@ if file:
                 "Consider secured financing options"
             ]
     
+        st.markdown('<div class="section-title">📈 How are we trending?</div>', unsafe_allow_html=True)
+
         col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown('<div class="card-light">Revenue Trend</div>', unsafe_allow_html=True)
+            st.line_chart(df["revenue"])
+        
+        with col2:
+            st.markdown('<div class="card-light">Scenario Score Trend</div>', unsafe_allow_html=True)
+            st.metric("Scenario Score", f"{s_score:,}")
     
         col1.markdown(f"""
     ### Decision: **{decision}**
