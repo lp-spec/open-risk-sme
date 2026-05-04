@@ -1,83 +1,141 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import io
 
 st.set_page_config(page_title="SME Risk Analyzer", layout="wide")
 
 st.title("📊 SME Risk Analyzer")
 st.caption("Turn financial data into lender-ready risk insights")
 
-uploaded_file = st.file_uploader("Upload your financial CSV", type="csv")
+# --- Download template ---
+template = """month,revenue,expenses,debt_payment
+Jan,80000,60000,10000
+Feb,85000,62000,10000
+Mar,78000,61000,10000
+Apr,90000,65000,10000
+"""
+
+st.download_button(
+    label="📥 Download CSV Template",
+    data=template,
+    file_name="sample_template.csv",
+    mime="text/csv"
+)
+
+# --- File upload ---
+uploaded_file = st.file_uploader("Upload your financial CSV", type=["csv"])
 
 if uploaded_file:
-    df = pd.read_csv(uploaded_file)
+    try:
+        df = pd.read_csv(uploaded_file)
 
-    # --- Show raw data ---
-    st.subheader("📁 Uploaded Data")
-    st.dataframe(df)
+        # --- Normalize column names ---
+        df.columns = [col.strip().lower() for col in df.columns]
 
-    # --- Normalize ---
-    df["profit"] = df["revenue"] - df["expenses"]
-    df["cash_flow"] = df["profit"] - df["debt_payment"]
+        # --- Column alias mapping ---
+        column_map = {
+            "revenue": ["revenue", "income", "total_income", "sales"],
+            "expenses": ["expenses", "cost", "costs", "operating_expenses"],
+            "debt_payment": ["debt_payment", "loan_payment", "debt", "payment"]
+        }
 
-    # --- Risk calculations ---
-    avg_cash = df["cash_flow"].mean()
-    debt = df["debt_payment"].mean()
+        def find_column(possible_names):
+            for name in possible_names:
+                if name in df.columns:
+                    return name
+            return None
 
-    dscr = avg_cash / debt if debt else 0
-    volatility = np.std(df["revenue"]) / np.mean(df["revenue"])
+        rev_col = find_column(column_map["revenue"])
+        exp_col = find_column(column_map["expenses"])
+        debt_col = find_column(column_map["debt_payment"])
 
-    score = 100
-    explanations = []
+        # --- Validate required columns ---
+        if not rev_col or not exp_col or not debt_col:
+            st.error(
+                "❌ Missing required columns.\n\n"
+                "Please include columns for revenue, expenses, and debt payment.\n\n"
+                "Tip: Download the template above."
+            )
+            st.stop()
 
-    if dscr < 1.2:
-        score -= 30
-        explanations.append("Low DSCR")
+        # --- Rename to standard ---
+        df = df.rename(columns={
+            rev_col: "revenue",
+            exp_col: "expenses",
+            debt_col: "debt_payment"
+        })
 
-    if volatility > 0.2:
-        score -= 20
-        explanations.append("High revenue volatility")
+        st.success(f"✅ Detected columns → revenue: {rev_col}, expenses: {exp_col}, debt: {debt_col}")
 
-    # --- Risk level ---
-    if score >= 80:
-        level = "Low"
-        color = "🟢"
-    elif score >= 60:
-        level = "Moderate"
-        color = "🟡"
-    else:
-        level = "High"
-        color = "🔴"
+        # --- Show raw data ---
+        st.subheader("📁 Uploaded Data")
+        st.dataframe(df)
 
-    # --- Display metrics ---
-    st.subheader("📈 Risk Summary")
+        # --- Normalize ---
+        df["profit"] = df["revenue"] - df["expenses"]
+        df["cash_flow"] = df["profit"] - df["debt_payment"]
 
-    col1, col2, col3 = st.columns(3)
+        # --- Risk calculations ---
+        avg_cash = df["cash_flow"].mean()
+        debt = df["debt_payment"].mean()
 
-    col1.metric("Risk Score", score)
-    col2.metric("DSCR", round(dscr, 2))
-    col3.metric("Volatility", round(volatility, 2))
+        dscr = avg_cash / debt if debt else 0
+        volatility = np.std(df["revenue"]) / np.mean(df["revenue"]) if np.mean(df["revenue"]) != 0 else 0
 
-    st.markdown(f"### Risk Level: {color} {level}")
+        score = 100
+        explanations = []
 
-    # --- Chart ---
-    st.subheader("📊 Revenue Trend")
-    st.line_chart(df["revenue"])
+        if dscr < 1.2:
+            score -= 30
+            explanations.append("Low DSCR (cash flow may not sufficiently cover debt obligations)")
 
-    # --- Explanations ---
-    st.subheader("⚠️ Risk Factors")
-    if explanations:
-        for e in explanations:
-            st.warning(e)
-    else:
-        st.success("No major risk signals detected")
+        if volatility > 0.2:
+            score -= 20
+            explanations.append("High revenue volatility (unstable income patterns)")
 
-    # --- Final Report ---
-    st.subheader("📄 Summary Report")
-    st.write({
-        "risk_score": score,
-        "risk_level": level,
-        "dscr": round(dscr, 2),
-        "volatility": round(volatility, 2),
-        "explanations": explanations
-    })
+        # --- Risk level ---
+        if score >= 80:
+            level = "Low"
+            color = "🟢"
+        elif score >= 60:
+            level = "Moderate"
+            color = "🟡"
+        else:
+            level = "High"
+            color = "🔴"
+
+        # --- Display metrics ---
+        st.subheader("📈 Risk Summary")
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Risk Score", score)
+        col2.metric("DSCR", round(dscr, 2))
+        col3.metric("Volatility", round(volatility, 2))
+
+        st.markdown(f"### Risk Level: {color} {level}")
+
+        # --- Chart ---
+        st.subheader("📊 Revenue Trend")
+        st.line_chart(df["revenue"])
+
+        # --- Explanations ---
+        st.subheader("⚠️ Risk Factors")
+        if explanations:
+            for e in explanations:
+                st.warning(e)
+        else:
+            st.success("No major risk signals detected")
+
+        # --- Final Report ---
+        st.subheader("📄 Summary Report")
+        st.json({
+            "risk_score": score,
+            "risk_level": level,
+            "dscr": round(dscr, 2),
+            "volatility": round(volatility, 2),
+            "explanations": explanations
+        })
+
+    except Exception as e:
+        st.error(f"⚠️ Error processing file: {str(e)}")
