@@ -202,14 +202,88 @@ Based on available financial data, the company's ability to service debt obligat
         else:
             st.error("High risk. Debt repayment capacity may be weak.")
 
-        st.markdown("**Lending Recommendation**")
-
+        # -----------------------------
+        # 🏦 Lending Decision Engine
+        # -----------------------------
+        st.markdown("## 🏦 Lending Recommendation & Simulation")
+        
+        avg_revenue = df["revenue"].mean()
+        avg_cash_flow = df["cash_flow"].mean()
+        
+        # --- Base loan sizing logic ---
+        loan_multiplier = 3  # baseline multiple of monthly cash flow
+        max_loan = max(avg_cash_flow * loan_multiplier, 0)
+        
+        # --- Decision logic ---
         if level == "Low":
-            st.write("Standard approval likely.")
+            decision = "Approved"
+            interest_rate = "6% – 10%"
+            term = "24–60 months"
+            conditions = [
+                "Standard underwriting review",
+                "No additional collateral required"
+            ]
+        
         elif level == "Moderate":
-            st.write("Conditional approval recommended.")
+            decision = "Conditionally Approved"
+            interest_rate = "10% – 16%"
+            term = "12–36 months"
+            conditions = [
+                "Provide additional financial documentation",
+                "Cash flow monitoring required",
+                "Possible personal guarantee"
+            ]
+            max_loan *= 0.7  # reduce exposure
+        
         else:
-            st.write("Further review required.")
+            decision = "Declined / High Risk"
+            interest_rate = "N/A"
+            term = "N/A"
+            conditions = [
+                "Insufficient cash flow coverage",
+                "Stabilize revenue before applying",
+                "Consider secured financing options"
+            ]
+            max_loan = 0
+        
+        # --- Display Decision ---
+        col1, col2 = st.columns(2)
+        
+        col1.markdown(f"""
+        ### Decision: **{decision}**
+        - **Estimated Max Loan:** ${int(max_loan):,}
+        - **Suggested Term:** {term}
+        """)
+        
+        col2.markdown(f"""
+        ### Pricing
+        - **Interest Rate Range:** {interest_rate}
+        - **Risk Level:** {level}
+        """)
+        
+        # --- Conditions ---
+        st.markdown("### 📋 Conditions / Notes")
+        for c in conditions:
+            st.write(f"- {c}")
+        
+        # -----------------------------
+        # 📊 Loan Stress Check
+        # -----------------------------
+        st.markdown("### 📉 Debt Capacity Check")
+        
+        if max_loan > 0:
+            estimated_monthly_payment = max_loan / 24  # simple estimate
+            coverage = avg_cash_flow / estimated_monthly_payment if estimated_monthly_payment else 0
+        
+            st.write(f"""
+            - Estimated Monthly Payment: ${int(estimated_monthly_payment):,}
+            - Cash Flow Coverage: {round(coverage,2)}
+            """)
+        
+            if coverage < 1.2:
+                st.warning("Loan may strain cash flow under current conditions.")
+            else:
+                st.success("Loan appears supportable based on current cash flow.")
 
         # -----------------------------
         # 📥 PDF DOWNLOAD
