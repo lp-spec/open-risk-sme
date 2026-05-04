@@ -192,34 +192,119 @@ if file:
     # =============================
     with tab3:
         st.subheader("📄 Credit Memo")
-
+    
+        # -----------------------------
+        # 🧾 Summary
+        # -----------------------------
         st.markdown(f"""
-**Risk Level:** {level}  
-**Score:** {score}
-""")
-
-        st.markdown("### 🏦 Lending Decision")
-
-        loan = max(avg_cash * 3, 0)
-
+    **Risk Level:** {level}  
+    **Risk Score:** {score}
+    """)
+    
+        # -----------------------------
+        # 🧠 Interpretation
+        # -----------------------------
+        st.markdown("### 🧠 Interpretation")
+    
+        if level == "Low":
+            st.success("Strong financial condition and stable cash flow.")
+        elif level == "Moderate":
+            st.warning("Moderate risk. Some instability in cash flow or revenue.")
+        else:
+            st.error("High risk. Debt repayment capacity may be weak.")
+    
+        # -----------------------------
+        # 🏦 Lending Recommendation
+        # -----------------------------
+        st.markdown("### 🏦 Lending Recommendation & Simulation")
+    
+        avg_revenue = df["revenue"].mean()
+        avg_cash_flow = df["cash_flow"].mean()
+    
+        loan_multiplier = 3
+        max_loan = max(avg_cash_flow * loan_multiplier, 0)
+    
         if level == "Low":
             decision = "Approved"
-            rate = "6–10%"
+            interest_rate = "6% – 10%"
+            term = "24–60 months"
+            conditions = [
+                "Standard underwriting review",
+                "No additional collateral required"
+            ]
+    
         elif level == "Moderate":
-            decision = "Conditional"
-            rate = "10–16%"
-            loan *= 0.7
+            decision = "Conditionally Approved"
+            interest_rate = "10% – 16%"
+            term = "12–36 months"
+            conditions = [
+                "Provide additional financial documentation",
+                "Cash flow monitoring required",
+                "Possible personal guarantee"
+            ]
+            max_loan *= 0.7
+    
         else:
-            decision = "Declined"
-            rate = "N/A"
-            loan = 0
-
-        st.write(f"Decision: {decision}")
-        st.write(f"Max Loan: ${int(loan):,}")
-        st.write(f"Rate: {rate}")
-
+            decision = "Declined / High Risk"
+            interest_rate = "N/A"
+            term = "N/A"
+            conditions = [
+                "Insufficient cash flow coverage",
+                "Stabilize revenue before applying",
+                "Consider secured financing options"
+            ]
+            max_loan = 0
+    
+        # -----------------------------
+        # 📊 Display Decision
+        # -----------------------------
+        col1, col2 = st.columns(2)
+    
+        col1.markdown(f"""
+    ### Decision: **{decision}**
+    - **Estimated Max Loan:** ${int(max_loan):,}
+    - **Suggested Term:** {term}
+    """)
+    
+        col2.markdown(f"""
+    ### Pricing
+    - **Interest Rate Range:** {interest_rate}
+    - **Risk Level:** {level}
+    """)
+    
+        # -----------------------------
+        # 📋 Conditions
+        # -----------------------------
+        st.markdown("### 📋 Conditions / Notes")
+        for c in conditions:
+            st.write(f"- {c}")
+    
+        # -----------------------------
+        # 📉 Stress Check
+        # -----------------------------
+        st.markdown("### 📉 Debt Capacity Check")
+    
+        if max_loan > 0:
+            estimated_payment = max_loan / 24
+            coverage = avg_cash_flow / estimated_payment if estimated_payment else 0
+    
+            st.write(f"""
+    - Estimated Monthly Payment: ${int(estimated_payment):,}
+    - Cash Flow Coverage: {round(coverage, 2)}
+    """)
+    
+            if coverage < 1.2:
+                st.warning("Loan may strain cash flow under current conditions.")
+            else:
+                st.success("Loan appears supportable based on current cash flow.")
+        else:
+            st.error("Loan not supportable under current conditions.")
+    
+        # -----------------------------
+        # 📥 PDF
+        # -----------------------------
         st.download_button(
-            "📄 Download PDF",
+            "📄 Download Credit Memo PDF",
             data=generate_pdf(score, level, dscr, volatility),
             file_name="credit_memo.pdf"
         )
