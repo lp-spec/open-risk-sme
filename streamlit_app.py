@@ -174,10 +174,126 @@ if file:
     # 🧪 SIMULATOR TAB
     # =============================
     with tab2:
-        st.subheader("Scenario Comparison")
-
-        st.metric("Base Score", score)
-        st.metric("Scenario Score", s_score)
+        st.subheader("🧪 Advanced Scenario Simulator")
+    
+        # -----------------------------
+        # 1️⃣ Scenario Presets
+        # -----------------------------
+        scenario = st.selectbox(
+            "Select Scenario",
+            [
+                "Base Case",
+                "Mild Stress (-10% Revenue)",
+                "Moderate Stress (-20% Revenue)",
+                "Severe Stress (-30% Revenue)",
+                "Expense Shock (+20% Expenses)"
+            ]
+        )
+    
+        sim_df = df.copy()
+    
+        if "Mild" in scenario:
+            sim_df["revenue"] *= 0.9
+        elif "Moderate" in scenario:
+            sim_df["revenue"] *= 0.8
+        elif "Severe" in scenario:
+            sim_df["revenue"] *= 0.7
+        elif "Expense" in scenario:
+            sim_df["expenses"] *= 1.2
+    
+        s_score, s_level, s_dscr, s_vol, _, _ = compute_metrics(sim_df)
+    
+        # -----------------------------
+        # 2️⃣ Side-by-side Comparison
+        # -----------------------------
+        st.subheader("📊 Scenario Comparison")
+    
+        pd_base = calculate_pd(score, dscr, volatility)
+        pd_s = calculate_pd(s_score, s_dscr, s_vol)
+    
+        st.table({
+            "Metric": ["Risk Score", "DSCR", "Volatility", "PD"],
+            "Base": [
+                score,
+                round(dscr, 2),
+                round(volatility, 2),
+                f"{pd_base*100:.1f}%"
+            ],
+            "Scenario": [
+                s_score,
+                round(s_dscr, 2),
+                round(s_vol, 2),
+                f"{pd_s*100:.1f}%"
+            ]
+        })
+    
+        # -----------------------------
+        # 3️⃣ Approval Boundary Test
+        # -----------------------------
+        st.subheader("🏦 Approval Boundary Explorer")
+    
+        baseline = max(avg_cash * 3, 0)
+    
+        test_loan = st.slider(
+            "Test Loan Amount",
+            0,
+            int(baseline * 3),
+            int(baseline),
+            step=1000
+        )
+    
+        est_payment = test_loan / 24 if test_loan else 0
+        coverage_test = avg_cash / est_payment if est_payment else 0
+    
+        if coverage_test >= 1.2:
+            st.success(f"Loan ${test_loan:,} likely APPROVED")
+        elif coverage_test >= 1.0:
+            st.warning(f"Loan ${test_loan:,} CONDITIONALLY APPROVED")
+        else:
+            st.error(f"Loan ${test_loan:,} likely DECLINED")
+    
+        # -----------------------------
+        # 4️⃣ Sensitivity Chart
+        # -----------------------------
+        st.subheader("📈 Sensitivity Analysis (Revenue Impact)")
+    
+        rev_range = np.linspace(0.5, 1.5, 20)
+        scores = []
+    
+        for r in rev_range:
+            temp = df.copy()
+            temp["revenue"] *= r
+            s, *_ = compute_metrics(temp)
+            scores.append(s)
+    
+        chart_df = pd.DataFrame({
+            "Revenue Multiplier": rev_range,
+            "Score": scores
+        })
+    
+        st.line_chart(chart_df.set_index("Revenue Multiplier"))
+    
+        # -----------------------------
+        # 5️⃣ Improvement Suggestions
+        # -----------------------------
+        st.subheader("💡 How to Improve Approval")
+    
+        suggestions = []
+    
+        if s_dscr < 1.2:
+            suggestions.append("Increase revenue or reduce loan size to improve DSCR")
+    
+        if s_vol > 0.2:
+            suggestions.append("Stabilize revenue streams (reduce volatility)")
+    
+        if s_score < score:
+            suggestions.append("Avoid stress scenarios that significantly reduce income")
+    
+        if suggestions:
+            for s in suggestions:
+                st.write(f"- {s}")
+        else:
+            st.success("Scenario remains strong — no major improvements needed")
 
     # =============================
     # 📄 CREDIT MEMO TAB RESTORED
