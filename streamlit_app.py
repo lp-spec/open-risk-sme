@@ -23,7 +23,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("📊 SME Risk Analyzer")
-st.caption("Financial risk analysis, benchmarking, and lending simulation")
+st.caption("Financial risk analysis, benchmarking, simulation, and lending decisions")
 
 # -----------------------------
 # 📥 Template
@@ -47,7 +47,7 @@ def get_industry_benchmark(industry):
     }.get(industry)
 
 # -----------------------------
-# 📉 PD
+# 📉 PD Model
 # -----------------------------
 def calculate_pd(score, dscr, volatility):
     pd = 0.02
@@ -86,9 +86,12 @@ def compute_metrics(df):
         score -= 20
         explanations.append(("High revenue volatility", "yellow"))
 
-    if score >= 80: level = "Low"
-    elif score >= 60: level = "Moderate"
-    else: level = "High"
+    if score >= 80:
+        level = "Low"
+    elif score >= 60:
+        level = "Moderate"
+    else:
+        level = "High"
 
     return score, level, dscr, volatility, explanations, avg_cash
 
@@ -107,7 +110,7 @@ if file:
     score, level, dscr, volatility, explanations, avg_cash = compute_metrics(df)
 
     # -----------------------------
-    # Sidebar Simulator
+    # 🧪 Sidebar Simulator
     # -----------------------------
     st.sidebar.header("🧪 Scenario Simulator")
 
@@ -137,7 +140,7 @@ if file:
     tab1, tab2, tab3 = st.tabs(["📊 Dashboard", "🧪 Simulator", "📄 Credit Memo"])
 
     # =============================
-    # Dashboard
+    # DASHBOARD
     # =============================
     with tab1:
         st.subheader("📈 Risk Summary")
@@ -148,49 +151,81 @@ if file:
         c3.metric("Volatility", round(volatility,2))
 
         st.subheader("🏦 Risk Alerts")
-        for text, color in explanations:
-            st.markdown(f'<div class="card {color}">{text}</div>', unsafe_allow_html=True)
+        if explanations:
+            for text, color in explanations:
+                st.markdown(f'<div class="card {color}">{text}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="card green">No major risks</div>', unsafe_allow_html=True)
 
         st.subheader("🏭 Industry Comparison")
         st.write(f"DSCR: {dscr:.2f} vs {benchmark['dscr']}")
         st.write(f"Volatility: {volatility:.2f} vs {benchmark['volatility']}")
 
     # =============================
-    # Simulator
+    # SIMULATOR (FULL FEATURES)
     # =============================
     with tab2:
-        st.subheader("🧪 Scenario Simulator")
+        st.subheader("🧪 Advanced Scenario Simulator")
 
-        st.write(f"Base Score: {score:,}")
-        st.write(f"Scenario Score: {s_score:,}")
+        scenario = st.selectbox("Scenario",
+            ["Base", "Mild Stress", "Severe Stress", "Expense Shock"])
 
-        st.subheader("💡 How to Improve Approval")
+        temp = df.copy()
+        if scenario == "Mild Stress":
+            temp["revenue"] *= 0.9
+        elif scenario == "Severe Stress":
+            temp["revenue"] *= 0.7
+        elif scenario == "Expense Shock":
+            temp["expenses"] *= 1.2
 
-        tips = []
+        sc_score, sc_level, sc_dscr, sc_vol, *_ = compute_metrics(temp)
 
-        if s_dscr < 1.2:
-            tips.append("Increase revenue or reduce loan size")
+        st.table({
+            "Metric":["Score","DSCR","Volatility"],
+            "Base":[score,round(dscr,2),round(volatility,2)],
+            "Scenario":[sc_score,round(sc_dscr,2),round(sc_vol,2)]
+        })
 
-        if s_vol > 0.2:
-            tips.append("Stabilize revenue streams")
+        # Boundary
+        baseline = max(avg_cash*3,0)
+        test = st.slider("Test Loan",0,int(baseline*3),int(baseline),step=1000)
 
-        if s_score < score:
-            tips.append("Avoid stress scenarios reducing income")
+        pay = test/24 if test else 0
+        cov = avg_cash/pay if pay else 0
 
-        if s_dscr < 1.0:
-            tips.append("Improve cash flow before taking new debt")
-
-        if s_vol > 0.3:
-            tips.append("Diversify income sources")
-
-        if tips:
-            for t in tips:
-                st.write(f"- {t}")
+        if cov>1.2:
+            st.success("Approved")
+        elif cov>1.0:
+            st.warning("Conditional")
         else:
-            st.success("No major improvements needed")
+            st.error("Declined")
+
+        # Sensitivity
+        st.subheader("📈 Sensitivity")
+
+        x = np.linspace(0.5,1.5,20)
+        y=[]
+        for r in x:
+            t=df.copy()
+            t["revenue"]*=r
+            s,*_=compute_metrics(t)
+            y.append(s)
+
+        st.line_chart(pd.DataFrame({"x":x,"score":y}).set_index("x"))
+
+        # Tips
+        st.subheader("💡 Improve Approval")
+
+        tips=[]
+        if sc_dscr<1.2: tips.append("Increase revenue or reduce loan")
+        if sc_vol>0.2: tips.append("Stabilize income")
+        if sc_level=="High": tips.append("Reduce risk exposure")
+
+        for t in tips:
+            st.write(f"- {t}")
 
     # =============================
-    # Credit Memo
+    # CREDIT MEMO
     # =============================
     with tab3:
         st.subheader("📄 Credit Memo")
@@ -200,25 +235,22 @@ if file:
         pd_val = calculate_pd(score, dscr, volatility)
         st.metric("PD", f"{pd_val*100:.1f}%")
 
-        # -----------------------------
-        # Lending Recommendation
-        # -----------------------------
         st.subheader("🏦 Lending Recommendation")
 
-        baseline = max(avg_cash * 3, 0)
+        base = max(avg_cash*3,0)
 
-        if level == "Low":
-            decision = "Approved"
-            rate = "6–10%"
-        elif level == "Moderate":
-            decision = "Conditional"
-            rate = "10–16%"
-            baseline *= 0.7
+        if level=="Low":
+            decision="Approved"
+            rate="6–10%"
+        elif level=="Moderate":
+            decision="Conditional"
+            rate="10–16%"
+            base*=0.7
         else:
-            decision = "Declined"
-            rate = "N/A"
-            baseline = 0
+            decision="Declined"
+            rate="N/A"
+            base=0
 
-        st.write(f"Decision: **{decision}**")
-        st.write(f"Suggested Loan: **${baseline:,.0f}**")
-        st.write(f"Estimated Rate: **{rate}**")
+        st.write(f"Decision: {decision}")
+        st.write(f"Loan: ${base:,.0f}")
+        st.write(f"Rate: {rate}")
