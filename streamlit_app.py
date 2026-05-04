@@ -289,7 +289,135 @@ This reflects revenue stability, debt coverage, and overall financial health.
         else:
             st.markdown('<div class="card green">No major risk detected</div>', unsafe_allow_html=True)
 
+        # -----------------------------
+        # 🏦 Lending Recommendation (FULL RESTORE + UPGRADE)
+        # -----------------------------
         st.markdown('<div class="card-light">Lending Recommendation</div>', unsafe_allow_html=True)
+        
+        baseline = max(avg_cash * 3, 0)
+        
+        # --- User Inputs (restore interactivity)
+        st.markdown("### Loan Structuring")
+        
+        loan_slider = st.slider(
+            "Requested Loan Amount",
+            0,
+            int(max(baseline * 2, 10000)),
+            int(baseline),
+            step=1000
+        )
+        
+        loan = st.number_input("Loan Amount (Manual Input)", value=int(loan_slider), step=1000)
+        
+        collateral_slider = st.slider(
+            "Collateral Value",
+            0,
+            int(max(baseline * 2, 10000)),
+            int(baseline * 0.5),
+            step=1000
+        )
+        
+        collateral = st.number_input("Collateral (Manual Input)", value=int(collateral_slider), step=1000)
+        
+        term = st.selectbox("Loan Term (months)", [12, 24, 36, 48, 60])
+        
+        # --- Calculations
+        payment = loan / term if term else 0
+        coverage = avg_cash / payment if payment else 0
+        ltv = loan / collateral if collateral else 999
+        
+        # --- Decision Logic
+        decision = "Approved"
+        rate = "6% – 10%"
+        conditions = []
+        improvements = []
+        
+        if coverage < 1.0 or ltv > 1.2 or level == "High":
+            decision = "Declined"
+            rate = "N/A"
+        elif coverage < 1.2 or ltv > 0.9:
+            decision = "Conditionally Approved"
+            rate = "10% – 16%"
+        
+        # -----------------------------
+        # 📊 Display Core Metrics
+        # -----------------------------
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Monthly Payment", f"${payment:,.0f}")
+        col2.metric("Cash Flow Coverage", f"{coverage:.2f}")
+        col3.metric("LTV (Loan-to-Value)", f"{ltv:.2f}")
+        
+        # -----------------------------
+        # 🏦 Decision Output
+        # -----------------------------
+        st.markdown(f"### Decision: **{decision}**")
+        st.write(f"**Estimated Rate:** {rate}")
+        
+        # -----------------------------
+        # 📋 What Lenders Typically Require
+        # -----------------------------
+        st.markdown("### 📋 Typical Lender Requirements")
+        
+        if coverage < 1.2:
+            conditions.append("Demonstrate stronger cash flow or reduce loan size")
+        
+        if ltv > 0.9:
+            conditions.append("Provide additional collateral or reduce loan amount")
+        
+        if volatility > 0.2:
+            conditions.append("Provide revenue history to explain volatility")
+        
+        if level == "Moderate":
+            conditions.append("Provide updated financial statements and projections")
+        
+        if level == "High":
+            conditions.append("May require secured financing or co-signer")
+        
+        if not conditions:
+            conditions.append("Standard underwriting documentation")
+        
+        for c in conditions:
+            st.write(f"- {c}")
+        
+        # -----------------------------
+        # 💡 Improvement Recommendations
+        # -----------------------------
+        st.markdown("### 💡 How to Improve Approval")
+        
+        if coverage < 1.2:
+            improvements.append("Increase revenue or reduce requested loan amount")
+        
+        if ltv > 0.9:
+            improvements.append("Increase collateral or reduce loan size")
+        
+        if volatility > 0.2:
+            improvements.append("Stabilize revenue streams or show longer track record")
+        
+        if dscr < 1.2:
+            improvements.append("Improve DSCR by increasing profit or reducing expenses")
+        
+        if benchmark and dscr < benchmark["dscr"]:
+            improvements.append("Bring performance in line with industry benchmarks")
+        
+        if improvements:
+            for i in improvements:
+                st.write(f"- {i}")
+        else:
+            st.success("Strong profile — no major improvements needed")
+        
+        # -----------------------------
+        # 🧠 Interpretation (Bank-style)
+        # -----------------------------
+        st.markdown("### 🧠 Credit Interpretation")
+        
+        if decision == "Approved":
+            st.success("Business demonstrates strong repayment ability with manageable risk.")
+        
+        elif decision == "Conditionally Approved":
+            st.warning("Business is viable but requires mitigations to reduce risk.")
+        
+        else:
+            st.error("Current financial profile does not support additional debt.")
 
         baseline = max(avg_cash * 3, 0)
 
