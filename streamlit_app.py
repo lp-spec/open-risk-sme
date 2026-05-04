@@ -9,19 +9,9 @@ st.set_page_config(page_title="SME Risk Analyzer", layout="wide")
 # -----------------------------
 st.markdown("""
 <style>
-/* Page */
-.block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 2rem;
-}
+.block-container {padding-top: 1.5rem; padding-bottom: 2rem;}
+section[data-testid="stSidebar"] {background-color: #111827; color: white;}
 
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background-color: #111827;
-    color: white;
-}
-
-/* KPI Cards */
 .kpi {
     padding: 18px;
     border-radius: 12px;
@@ -29,7 +19,6 @@ section[data-testid="stSidebar"] {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Section headers */
 .section-title {
     font-size: 22px;
     font-weight: 600;
@@ -37,14 +26,12 @@ section[data-testid="stSidebar"] {
     margin-bottom: 10px;
 }
 
-/* Subtle card */
 .card-light {
     padding: 15px;
     border-radius: 10px;
     background: #f3f4f6;
 }
 
-/* Risk cards */
 .card {
     padding: 12px;
     border-radius: 8px;
@@ -61,7 +48,7 @@ st.title("📊 SME Risk Analyzer")
 st.caption("Financial risk analysis, benchmarking, simulation, and lending decisions")
 
 # -----------------------------
-# 📥 Template
+# Template
 # -----------------------------
 template = """month,revenue,expenses,debt_payment
 Jan,80000,60000,10000
@@ -70,19 +57,19 @@ Feb,85000,62000,10000
 st.download_button("📥 Download Sample CSV", template, "sample.csv")
 
 # -----------------------------
-# 🏭 Benchmark
+# Benchmark
 # -----------------------------
 def get_industry_benchmark(industry):
     return {
         "General": {"dscr": 1.2, "volatility": 0.15},
         "Restaurant": {"dscr": 1.3, "volatility": 0.25},
         "Retail": {"dscr": 1.25, "volatility": 0.2},
-        "SaaS": {"dscr": 1.1, "volatility": 0.1},
+        "Real Estate": {"dscr": 1.2, "volatility": 0.1},
         "Construction": {"dscr": 1.4, "volatility": 0.3},
-    }.get(industry)
+    }.get(industry, {"dscr":1.2,"volatility":0.15})
 
 # -----------------------------
-# 📉 PD Model
+# PD
 # -----------------------------
 def calculate_pd(score, dscr, volatility):
     pd = 0.02
@@ -98,9 +85,11 @@ def calculate_pd(score, dscr, volatility):
     return min(pd, 0.6)
 
 # -----------------------------
-# 📊 Metrics
+# Metrics
 # -----------------------------
 def compute_metrics(df):
+    df = df.copy()  # FIX: avoid mutation
+
     df["profit"] = df["revenue"] - df["expenses"]
     df["cash_flow"] = df["profit"] - df["debt_payment"]
 
@@ -131,7 +120,7 @@ def compute_metrics(df):
     return score, level, dscr, volatility, explanations, avg_cash
 
 # -----------------------------
-# 📤 Upload
+# Upload
 # -----------------------------
 file = st.file_uploader("Upload CSV or Excel", type=["csv", "xlsx"])
 
@@ -145,36 +134,31 @@ if file:
     score, level, dscr, volatility, explanations, avg_cash = compute_metrics(df)
 
     # -----------------------------
-    # 🧪 Sidebar Simulator
+    # Sidebar Controls
     # -----------------------------
     st.sidebar.title("⚙️ Controls")
-    
-    st.sidebar.markdown("### Scenario")
+
     rev = st.sidebar.slider("Revenue %", -50, 50, 0)
     exp = st.sidebar.slider("Expense %", -50, 50, 0)
     debt = st.sidebar.slider("Debt %", -50, 50, 0)
-    
-    st.sidebar.markdown("### Industry")
+
     industry = st.sidebar.selectbox(
         "Select Industry",
         ["General","Restaurant","Retail","Real Estate","Construction"]
     )
 
+    benchmark = get_industry_benchmark(industry)
+
+    # Scenario (sidebar-driven)
     sim_df = df.copy()
     sim_df["revenue"] *= (1 + rev / 100)
     sim_df["expenses"] *= (1 + exp / 100)
     sim_df["debt_payment"] *= (1 + debt / 100)
 
-    s_score, s_level, s_dscr, s_vol, *_ = compute_metrics(sim_df)
+    s_score, s_level, s_dscr, s_vol, _, _ = compute_metrics(sim_df)
 
     st.sidebar.write(f"Scenario Score: {s_score:,}")
     st.sidebar.write(f"Scenario Risk: {s_level}")
-
-    # -----------------------------
-    # Industry - not using this for now
-    # -----------------------------
-    # industry = st.selectbox("Select Industry", ["General","Restaurant","Retail","SaaS","Construction"])
-    # benchmark = get_industry_benchmark(industry)
 
     # -----------------------------
     # Tabs
@@ -182,13 +166,12 @@ if file:
     tab1, tab2, tab3 = st.tabs(["Dashboard", "Simulator", "Credit Memo"])
 
     # =============================
-    # DASHBOARD
+    # Dashboard
     # =============================
     with tab1:
         st.markdown('<div class="section-title">📊 Key Metrics</div>', unsafe_allow_html=True)
-        
+
         c1, c2, c3, c4 = st.columns(4)
-        
         c1.markdown(f'<div class="kpi"><b>Risk Score</b><br>{score:,}</div>', unsafe_allow_html=True)
         c2.markdown(f'<div class="kpi"><b>DSCR</b><br>{dscr:.2f}</div>', unsafe_allow_html=True)
         c3.markdown(f'<div class="kpi"><b>Volatility</b><br>{volatility:.2f}</div>', unsafe_allow_html=True)
@@ -202,17 +185,25 @@ if file:
             st.markdown('<div class="card green">No major risks</div>', unsafe_allow_html=True)
 
         st.subheader("🏭 Industry Comparison")
-        st.write(f"DSCR: {dscr:.2f} vs {benchmark['dscr']}")
-        st.write(f"Volatility: {volatility:.2f} vs {benchmark['volatility']}")
+        st.write(f"DSCR: {dscr:.2f} vs {benchmark['dscr']:.2f}")
+        st.write(f"Volatility: {volatility:.2f} vs {benchmark['volatility']:.2f}")
+
+        # moved trend HERE (fix #9)
+        st.markdown('<div class="section-title">📈 Revenue Trend</div>', unsafe_allow_html=True)
+        st.line_chart(df["revenue"])
 
     # =============================
-    # SIMULATOR (FULL FEATURES)
+    # Simulator
     # =============================
     with tab2:
         st.subheader("🧪 Advanced Scenario Simulator")
 
-        scenario = st.selectbox("Scenario",
-            ["Base", "Mild Stress", "Severe Stress", "Expense Shock"])
+        st.caption("Note: Sidebar sliders = primary simulation. Below presets = quick scenarios.")
+
+        scenario = st.selectbox(
+            "Scenario Preset",
+            ["Base", "Mild Stress", "Severe Stress", "Expense Shock"]
+        )
 
         temp = df.copy()
         if scenario == "Mild Stress":
@@ -222,7 +213,7 @@ if file:
         elif scenario == "Expense Shock":
             temp["expenses"] *= 1.2
 
-        sc_score, sc_level, sc_dscr, sc_vol, *_ = compute_metrics(temp)
+        sc_score, sc_level, sc_dscr, sc_vol, _, _ = compute_metrics(temp)
 
         st.table({
             "Metric":["Score","DSCR","Volatility"],
@@ -230,7 +221,6 @@ if file:
             "Scenario":[sc_score,round(sc_dscr,2),round(sc_vol,2)]
         })
 
-        # Boundary
         baseline = max(avg_cash*3,0)
         test = st.slider("Test Loan",0,int(baseline*3),int(baseline),step=1000)
 
@@ -244,20 +234,17 @@ if file:
         else:
             st.error("Declined")
 
-        # Sensitivity
-        st.subheader("📈 Sensitivity")
-
+        # Sensitivity FIX (#6)
         x = np.linspace(0.5,1.5,20)
         y=[]
         for r in x:
             t=df.copy()
             t["revenue"]*=r
-            s,*_=compute_metrics(t)
+            s, _, _, _, _, _ = compute_metrics(t)
             y.append(s)
 
         st.line_chart(pd.DataFrame({"x":x,"score":y}).set_index("x"))
 
-        # Tips
         st.subheader("💡 Improve Approval")
 
         tips=[]
@@ -265,154 +252,72 @@ if file:
         if sc_vol>0.2: tips.append("Stabilize income")
         if sc_level=="High": tips.append("Reduce risk exposure")
 
-        for t in tips:
-            st.write(f"- {t}")
+        if tips:
+            for t in tips:
+                st.write(f"- {t}")
+        else:
+            st.success("No major improvements needed")
 
     # =============================
-    # CREDIT MEMO
+    # Credit Memo
     # =============================
     with tab3:
-        #st.subheader("📄 Credit Memo") not using this for now
         st.markdown('<div class="section-title">📄 Credit Memo</div>', unsafe_allow_html=True)
-    
-        # -----------------------------
-        # 🧾 Executive Summary
-        # -----------------------------
+
         st.markdown('<div class="card-light">Executive Summary</div>', unsafe_allow_html=True)
-    
         st.write(f"""
-    The business presents a **{level} risk profile** with a risk score of **{score:,}**.
-    This evaluation reflects the company’s ability to generate stable revenue and cover debt obligations.
-    """)
-    
-        # -----------------------------
-        # 📊 Key Metrics
-        # -----------------------------
+The business presents a **{level} risk profile** with a risk score of **{score:,}**.
+""")
+
         st.markdown("### 📊 Key Metrics")
-    
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Risk Score", f"{score:,}")
-        col2.metric("DSCR", round(dscr, 2))
-        col3.metric("Volatility", round(volatility, 2))
-    
+
+        col_a, col_b, col_c = st.columns(3)
+        col_a.metric("Risk Score", f"{score:,}")
+        col_b.metric("DSCR", f"{dscr:.2f}")
+        col_c.metric("Volatility", f"{volatility:.2f}")
+
         pd_val = calculate_pd(score, dscr, volatility)
-        st.metric("Probability of Default (PD)", f"{pd_val*100:.1f}%")
-    
-        st.markdown("""
-    **What these mean:**
-    - **DSCR (Debt Service Coverage Ratio):** Ability to cover debt payments  
-      > Above 1.2 is generally considered healthy  
-    - **Volatility:** Stability of revenue  
-      > Lower volatility means more predictable income  
-    - **PD (Probability of Default):** Likelihood of failing to repay  
-    """)
-    
-        # -----------------------------
-        # 🏦 Risk Factors (Bank Style)
-        # -----------------------------
+        st.metric("PD", f"{pd_val*100:.1f}%")
+
         st.markdown('<div class="section-title">⚠️ Risk Signals</div>', unsafe_allow_html=True)
-        
         if explanations:
             for text, color in explanations:
                 st.markdown(f'<div class="card {color}">{text}</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="card green">No major risk detected</div>', unsafe_allow_html=True)
-    
-        # -----------------------------
-        # 🧠 Interpretation
-        # -----------------------------
-        st.markdown("### 🧠 Credit Interpretation")
-    
-        if level == "Low":
-            st.success("Strong financial condition. Low likelihood of default.")
-        elif level == "Moderate":
-            st.warning("Moderate risk. Some instability in cash flow or revenue.")
-        else:
-            st.error("High risk. Debt repayment capacity is weak and requires caution.")
-    
-        # -----------------------------
-        # 🏦 Lending Recommendation (FULL)
-        # -----------------------------
-        st.markdown('<div class="card-light">Lending Recommendation")</div>', unsafe_allow_html=True)
-    
-        baseline = max(avg_cash * 3, 0)
-    
-        if level == "Low":
-            decision = "Approved"
-            rate = "6% – 10%"
-            term = "24–60 months"
-            conditions = [
-                "Standard underwriting review",
-                "No additional collateral required"
-            ]
-    
-        elif level == "Moderate":
-            decision = "Conditionally Approved"
-            rate = "10% – 16%"
-            term = "12–36 months"
-            baseline *= 0.7
-            conditions = [
-                "Provide additional financial documentation",
-                "Cash flow monitoring required",
-                "Possible personal guarantee"
-            ]
-    
-        else:
-            decision = "Declined"
-            rate = "N/A"
-            term = "N/A"
-            baseline = 0
-            conditions = [
-                "Insufficient cash flow coverage",
-                "Stabilize revenue before applying",
-                "Consider secured financing options"
-            ]
-    
-        st.markdown('<div class="section-title">📈 How are we trending?</div>', unsafe_allow_html=True)
 
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown('<div class="card-light">Revenue Trend</div>', unsafe_allow_html=True)
-            st.line_chart(df["revenue"])
-        
-        with col2:
-            st.markdown('<div class="card-light">Scenario Score Trend</div>', unsafe_allow_html=True)
-            st.metric("Scenario Score", f"{s_score:,}")
-    
-        col1.markdown(f"""
-    ### Decision: **{decision}**
-    - **Suggested Loan Amount:** ${baseline:,.0f}
-    - **Suggested Term:** {term}
-    """)
-    
-        col2.markdown(f"""
-    ### Pricing
-    - **Interest Rate:** {rate}
-    - **Risk Level:** {level}
-    """)
-    
-        st.markdown("### 📋 Conditions / Notes")
+        st.markdown('<div class="card-light">Lending Recommendation</div>', unsafe_allow_html=True)
+
+        baseline = max(avg_cash * 3, 0)
+
+        if level == "Low":
+            decision, rate, term = "Approved", "6–10%", "24–60 months"
+            conditions = ["Standard underwriting review"]
+        elif level == "Moderate":
+            decision, rate, term = "Conditional", "10–16%", "12–36 months"
+            baseline *= 0.7
+            conditions = ["Additional documentation required"]
+        else:
+            decision, rate, term = "Declined", "N/A", "N/A"
+            baseline = 0
+            conditions = ["Improve financial stability"]
+
+        c1, c2 = st.columns(2)
+
+        with c1:
+            st.markdown(f"""
+### Decision: **{decision}**
+- Loan: ${baseline:,.0f}
+- Term: {term}
+""")
+
+        with c2:
+            st.markdown(f"""
+### Pricing
+- Rate: {rate}
+- Risk: {level}
+""")
+
+        st.markdown("### 📋 Conditions")
         for c in conditions:
             st.write(f"- {c}")
-    
-        # -----------------------------
-        # 📉 Debt Capacity Check
-        # -----------------------------
-        st.markdown("### 📉 Debt Capacity Check")
-    
-        if baseline > 0:
-            est_payment = baseline / 24
-            coverage = avg_cash / est_payment if est_payment else 0
-    
-            st.write(f"""
-    - Estimated Monthly Payment: ${est_payment:,.0f}
-    - Cash Flow Coverage: {round(coverage, 2)}
-    """)
-    
-            if coverage < 1.2:
-                st.warning("Loan may strain cash flow under current conditions.")
-            else:
-                st.success("Loan appears supportable based on current cash flow.")
-        else:
-            st.error("Loan not supportable under current conditions.")
