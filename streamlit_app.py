@@ -35,27 +35,27 @@ section[data-testid="stSidebar"] {
     padding-top: 1.5rem;
 }
 section[data-testid="stSidebar"] .stMarkdown h2 {
-    font-size: 13px !important;
+    font-size: 14px !important;
     font-weight: 600 !important;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #64748b !important;
+    color: #1e293b !important;
     margin-bottom: 4px;
 }
 section[data-testid="stSidebar"] p {
     font-size: 13px;
-    color: #64748b;
+    color: #334155;
 }
 section[data-testid="stSidebar"] hr {
     border-color: #e2e8f0 !important;
     margin: 16px 0;
 }
 section[data-testid="stSidebar"] label {
-    font-size: 11px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.07em !important;
-    color: #94a3b8 !important;
+    color: #334155 !important;
 }
 
 /* ── App header ── */
@@ -82,7 +82,7 @@ section[data-testid="stSidebar"] label {
     letter-spacing: -0.4px;
 }
 .app-pill {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     background: #dbeafe;
     color: #1d4ed8;
@@ -92,17 +92,17 @@ section[data-testid="stSidebar"] label {
 }
 .app-subtitle {
     font-size: 13px;
-    color: #94a3b8;
+    color: #334155;
     margin-left: auto;
 }
 
 /* ── Section headings ── */
 .sh {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: #334155;
     margin: 30px 0 14px 0;
     padding-bottom: 8px;
     border-bottom: 1px solid #e8ecf0;
@@ -115,7 +115,7 @@ section[data-testid="stSidebar"] label {
     background: #eff6ff;
     border-radius: 4px;
     display: inline-flex; align-items: center; justify-content: center;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 /* ── KPI cards ── */
@@ -142,11 +142,11 @@ section[data-testid="stSidebar"] label {
 .kpi-accent-purple { background: #8b5cf6; }
 
 .kpi-label {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #94a3b8;
+    letter-spacing: 0.08em;
+    color: #334155;
     margin-bottom: 8px;
 }
 .kpi-value {
@@ -158,13 +158,13 @@ section[data-testid="stSidebar"] label {
     letter-spacing: -0.5px;
 }
 .kpi-sub {
-    font-size: 11px;
-    color: #94a3b8;
+    font-size: 12px;
+    color: #334155;
     margin-top: 5px;
     font-weight: 400;
 }
-.kpi-delta-up   { color: #10b981; font-size: 11px; font-weight: 600; }
-.kpi-delta-down { color: #ef4444; font-size: 11px; font-weight: 600; }
+.kpi-delta-up   { color: #10b981; font-size: 12px; font-weight: 600; }
+.kpi-delta-down { color: #ef4444; font-size: 12px; font-weight: 600; }
 
 /* ── Alert / signal rows ── */
 .alert {
@@ -174,7 +174,7 @@ section[data-testid="stSidebar"] label {
     padding: 11px 16px;
     border-radius: 7px;
     margin-bottom: 7px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     border: 1px solid transparent;
 }
@@ -193,11 +193,11 @@ section[data-testid="stSidebar"] label {
     padding: 11px 0; border-bottom: 1px solid #f1f5f9;
 }
 .brow:last-child { border-bottom: none; }
-.blabel { font-size: 12px; color: #475569; width: 110px; flex-shrink: 0; font-weight: 500; }
+.blabel { font-size: 13px; color: #1e293b; width: 110px; flex-shrink: 0; font-weight: 500; }
 .btrack { flex: 1; background: #f1f5f9; border-radius: 4px; height: 7px; overflow: hidden; }
 .bfill  { height: 7px; border-radius: 4px; }
 .bvals  {
-    font-size: 11px; color: #64748b; width: 200px;
+    font-size: 12px; color: #334155; width: 200px;
     text-align: right; flex-shrink: 0;
     font-family: 'IBM Plex Mono', monospace;
     letter-spacing: 0;
@@ -210,8 +210,8 @@ section[data-testid="stSidebar"] label {
     border-left: 3px solid #3b82f6;
     border-radius: 0 8px 8px 0;
     padding: 14px 18px;
-    font-size: 13px;
-    color: #475569;
+    font-size: 14px;
+    color: #1e293b;
     line-height: 1.7;
     margin: 12px 0;
 }
@@ -224,8 +224,8 @@ section[data-testid="stSidebar"] label {
     border: 1px solid #e8ecf0;
     border-radius: 7px;
     margin-bottom: 6px;
-    font-size: 13px;
-    color: #334155;
+    font-size: 14px;
+    color: #1e293b;
 }
 .li-dot {
     width: 5px; height: 5px; border-radius: 50%;
@@ -238,7 +238,7 @@ section[data-testid="stSidebar"] label {
     display: inline-block;
     padding: 5px 16px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -254,7 +254,7 @@ section[data-testid="stSidebar"] label {
     font-size: 13px;
 }
 .mrow:last-child { border-bottom: none; }
-.mk { color: #64748b; font-weight: 400; }
+.mk { color: #334155; font-weight: 400; }
 .mv { color: #0f172a; font-weight: 600; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
 
 /* ── Sidebar result card ── */
@@ -266,11 +266,11 @@ section[data-testid="stSidebar"] label {
     margin-top: 4px;
 }
 .sr-label {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: #334155;
     margin-bottom: 2px;
 }
 .sr-val {
@@ -296,9 +296,9 @@ section[data-testid="stSidebar"] label {
     background: transparent;
 }
 .stTabs [data-baseweb="tab"] {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
-    color: #64748b;
+    color: #334155;
     padding: 10px 24px;
     border-radius: 0;
     border-bottom: 2px solid transparent;
@@ -316,11 +316,11 @@ section[data-testid="stSidebar"] label {
 .stNumberInput label,
 .stSelectbox label,
 .stSlider label {
-    font-size: 11px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.07em !important;
-    color: #64748b !important;
+    color: #334155 !important;
 }
 
 /* ── Streamlit overrides ── */
@@ -354,8 +354,8 @@ div[data-testid="stHorizontalBlock"] { gap: 14px; }
     border: 1px solid #fde68a;
     border-radius: 8px;
     padding: 14px 18px;
-    font-size: 13px;
-    color: #92400e;
+    font-size: 14px;
+    color: #78350f;
     margin-top: 16px;
 }
 
@@ -363,12 +363,12 @@ div[data-testid="stHorizontalBlock"] { gap: 14px; }
 .ctable {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 14px;
 }
 .ctable th {
     background: #f8fafc;
-    color: #64748b;
-    font-size: 10px;
+    color: #334155;
+    font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -379,19 +379,19 @@ div[data-testid="stHorizontalBlock"] { gap: 14px; }
 .ctable td {
     padding: 10px 14px;
     border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    color: #1e293b;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
+    font-size: 14px;
 }
 .ctable tr:last-child td { border-bottom: none; }
 .ctable .metric-name {
     font-family: 'IBM Plex Sans', sans-serif;
-    color: #475569;
+    color: #1e293b;
     font-weight: 500;
 }
 .td-better { color: #15803d; font-weight: 600; }
 .td-worse  { color: #b91c1c; font-weight: 600; }
-.td-same   { color: #64748b; }
+.td-same   { color: #334155; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -711,7 +711,7 @@ with tab1:
         </div>""", unsafe_allow_html=True)
 
         st.markdown(
-            f"<div style='font-size:11px;color:#94a3b8;margin-top:10px;'>Industry: <strong>{industry}</strong></div>",
+            f"<div style='font-size:13px;color:#334155;margin-top:10px;'>Industry: <strong>{industry}</strong></div>",
             unsafe_allow_html=True,
         )
 
@@ -782,7 +782,7 @@ with tab2:
         delta_html = (
             f'<span class="kpi-delta-up">▲ {sc_delta}</span>' if sc_delta > 0
             else f'<span class="kpi-delta-down">▼ {abs(sc_delta)}</span>' if sc_delta < 0
-            else '<span style="color:#64748b;">— No change</span>'
+            else '<span style="color:#334155;">— No change</span>'
         )
         st.markdown(f"""
         <div class="kpi" style="margin-bottom:14px;">
